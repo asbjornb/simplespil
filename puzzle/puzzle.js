@@ -203,16 +203,16 @@
         ctx.fillStyle = '#3d6b34';
         ctx.fillRect(0, h * 0.88, w, h * 0.12);
         // Castle
-        const cx = w * 0.3, cy = h * 0.38, cw = w * 0.4, ch = h * 0.35;
+        const ccx = w * 0.3, cy = h * 0.38, cw = w * 0.4, ch = h * 0.35;
         ctx.fillStyle = '#a0a0b8';
-        ctx.fillRect(cx, cy, cw, ch);
+        ctx.fillRect(ccx, cy, cw, ch);
         // Towers
         ctx.fillStyle = '#8a8a9a';
-        ctx.fillRect(cx - w * 0.04, cy - h * 0.1, w * 0.08, ch + h * 0.1);
-        ctx.fillRect(cx + cw - w * 0.04, cy - h * 0.1, w * 0.08, ch + h * 0.1);
+        ctx.fillRect(ccx - w * 0.04, cy - h * 0.1, w * 0.08, ch + h * 0.1);
+        ctx.fillRect(ccx + cw - w * 0.04, cy - h * 0.1, w * 0.08, ch + h * 0.1);
         // Tower tops
         ctx.fillStyle = '#e94560';
-        [cx, cx + cw].forEach(tx => {
+        [ccx, ccx + cw].forEach(tx => {
           ctx.beginPath();
           ctx.moveTo(tx - w * 0.05, cy - h * 0.1);
           ctx.lineTo(tx, cy - h * 0.22);
@@ -222,33 +222,33 @@
         // Battlements
         ctx.fillStyle = '#8a8a9a';
         for (let i = 0; i < 6; i++) {
-          ctx.fillRect(cx + i * (cw / 6) + 2, cy - h * 0.03, cw / 8, h * 0.03);
+          ctx.fillRect(ccx + i * (cw / 6) + 2, cy - h * 0.03, cw / 8, h * 0.03);
         }
         // Gate
         ctx.fillStyle = '#5a4a3a';
         ctx.beginPath();
-        ctx.moveTo(cx + cw * 0.35, cy + ch);
-        ctx.lineTo(cx + cw * 0.35, cy + ch * 0.55);
-        ctx.arc(cx + cw * 0.5, cy + ch * 0.55, cw * 0.15, Math.PI, 0);
-        ctx.lineTo(cx + cw * 0.65, cy + ch);
+        ctx.moveTo(ccx + cw * 0.35, cy + ch);
+        ctx.lineTo(ccx + cw * 0.35, cy + ch * 0.55);
+        ctx.arc(ccx + cw * 0.5, cy + ch * 0.55, cw * 0.15, Math.PI, 0);
+        ctx.lineTo(ccx + cw * 0.65, cy + ch);
         ctx.fill();
         // Windows
         ctx.fillStyle = '#f5c518';
         [[0.38, 0.35], [0.62, 0.35], [0.5, 0.15]].forEach(([wx, wy]) => {
-          ctx.fillRect(cx + cw * wx - 5, cy + ch * wy, 10, 14);
+          ctx.fillRect(ccx + cw * wx - 5, cy + ch * wy, 10, 14);
         });
         // Flag
         ctx.strokeStyle = '#5a4a3a';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(cx + cw * 0.5, cy - h * 0.03);
-        ctx.lineTo(cx + cw * 0.5, cy - h * 0.13);
+        ctx.moveTo(ccx + cw * 0.5, cy - h * 0.03);
+        ctx.lineTo(ccx + cw * 0.5, cy - h * 0.13);
         ctx.stroke();
         ctx.fillStyle = '#e94560';
         ctx.beginPath();
-        ctx.moveTo(cx + cw * 0.5, cy - h * 0.13);
-        ctx.lineTo(cx + cw * 0.5 + 15, cy - h * 0.1);
-        ctx.lineTo(cx + cw * 0.5, cy - h * 0.07);
+        ctx.moveTo(ccx + cw * 0.5, cy - h * 0.13);
+        ctx.lineTo(ccx + cw * 0.5 + 15, cy - h * 0.1);
+        ctx.lineTo(ccx + cw * 0.5, cy - h * 0.07);
         ctx.fill();
       }
     },
@@ -399,17 +399,19 @@
   // --- State ---
   let selectedPic = 0;
   let gridSize = 3;
-  let tiles = [];
-  let emptyIdx;
   let moves = 0;
   let startTime = 0;
   let timerInterval;
-  let canvas, ctx;
-  let tileSize;
-  let canvasSize;
+  let sourceCanvas;
+  let boardSize;
+  let pieceSize;
+  let trayPieceSize;
+  let imageDataURL;
+  let placedCount = 0;
+  let totalPieces = 0;
+  let selectedPieceEl = null;
   let showingHint = false;
   let hintTimeout;
-  let sourceCanvas; // Pre-rendered full image
 
   // --- DOM ---
   const menuEl = document.getElementById('menu');
@@ -418,6 +420,8 @@
   const movesEl = document.getElementById('moves-display');
   const timerEl = document.getElementById('timer-display');
   const picSelectEl = document.getElementById('picture-select');
+  const boardEl = document.getElementById('puzzle-board');
+  const trayEl = document.getElementById('piece-tray');
 
   // --- Build picture previews ---
   pictures.forEach((pic, i) => {
@@ -430,7 +434,6 @@
     try {
       pic.draw(c.getContext('2d'), 90, 90);
     } catch (e) {
-      // Fallback: fill with a color so the button is still usable
       const fallbackCtx = c.getContext('2d');
       fallbackCtx.fillStyle = ['#e94560', '#4ecca3', '#3498db', '#f5c518', '#9b59b6', '#f39c12'][i % 6];
       fallbackCtx.fillRect(0, 0, 90, 90);
@@ -457,7 +460,7 @@
     });
   });
 
-  // --- Start ---
+  // --- Button handlers ---
   document.getElementById('start-btn').addEventListener('click', startGame);
   document.getElementById('next-btn').addEventListener('click', () => {
     selectedPic = (selectedPic + 1) % pictures.length;
@@ -469,63 +472,53 @@
     menuEl.style.display = 'flex';
     clearInterval(timerInterval);
   });
-
   document.getElementById('hint-btn').addEventListener('click', showHint);
 
+  // --- Game ---
   function startGame() {
     SimplespilStats.recordPlay('puzzle');
-    // Reset hint state from any previous game
     showingHint = false;
     clearTimeout(hintTimeout);
+    selectedPieceEl = null;
 
-    canvas = document.getElementById('puzzle-canvas');
-    ctx = canvas.getContext('2d');
     menuEl.style.display = 'none';
     gameEl.style.display = 'flex';
     winEl.style.display = 'none';
 
-    // Calculate canvas size (account for HUD and safe area on mobile)
-    const maxSize = Math.min(window.innerWidth - 20, window.innerHeight - 80, 500);
-    canvasSize = Math.floor(maxSize / gridSize) * gridSize;
-    canvas.width = canvasSize;
-    canvas.height = canvasSize;
-    tileSize = canvasSize / gridSize;
+    // Size the board to fit screen with room for the tray
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+    const isMobile = screenW <= 480;
+    const hudSpace = isMobile ? 70 : 50;
+    const trayMinHeight = 100;
+    const paddings = 100;
+    const availableH = screenH - hudSpace - trayMinHeight - paddings;
+    const maxBoardSize = Math.min(screenW - 40, availableH, 420);
+    boardSize = Math.floor(maxBoardSize / gridSize) * gridSize;
+    pieceSize = boardSize / gridSize;
+    trayPieceSize = Math.max(40, Math.min(pieceSize, 90));
+    totalPieces = gridSize * gridSize;
+    placedCount = 0;
 
     // Pre-render full image
     sourceCanvas = document.createElement('canvas');
-    sourceCanvas.width = canvasSize;
-    sourceCanvas.height = canvasSize;
+    sourceCanvas.width = boardSize;
+    sourceCanvas.height = boardSize;
     try {
-      pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+      pictures[selectedPic].draw(sourceCanvas.getContext('2d'), boardSize, boardSize);
     } catch (e) {
-      // Fallback: draw a colored gradient so the game is still playable
       const sctx = sourceCanvas.getContext('2d');
-      const grad = sctx.createLinearGradient(0, 0, canvasSize, canvasSize);
+      const grad = sctx.createLinearGradient(0, 0, boardSize, boardSize);
       grad.addColorStop(0, '#e94560');
       grad.addColorStop(0.5, '#f5c518');
       grad.addColorStop(1, '#4ecca3');
       sctx.fillStyle = grad;
-      sctx.fillRect(0, 0, canvasSize, canvasSize);
+      sctx.fillRect(0, 0, boardSize, boardSize);
     }
+    imageDataURL = sourceCanvas.toDataURL();
 
-    // Create tiles (last tile is empty)
-    const total = gridSize * gridSize;
-    tiles = [];
-    for (let i = 0; i < total - 1; i++) {
-      tiles.push(i);
-    }
-    tiles.push(-1); // empty
-    emptyIdx = total - 1;
-
-    // Shuffle (only valid moves to ensure solvability)
-    const shuffleMoves = gridSize * gridSize * 20;
-    for (let i = 0; i < shuffleMoves; i++) {
-      const neighbors = getMovableNeighbors(emptyIdx);
-      const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
-      tiles[emptyIdx] = tiles[pick];
-      tiles[pick] = -1;
-      emptyIdx = pick;
-    }
+    buildBoard();
+    buildTray();
 
     moves = 0;
     movesEl.textContent = 'Moves: 0';
@@ -533,21 +526,197 @@
     clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
     timerEl.textContent = 'Time: 0:00';
-
-    drawPuzzle();
   }
 
-  function getMovableNeighbors(idx) {
-    const row = Math.floor(idx / gridSize);
-    const col = idx % gridSize;
-    const neighbors = [];
-    if (row > 0) neighbors.push(idx - gridSize);
-    if (row < gridSize - 1) neighbors.push(idx + gridSize);
-    if (col > 0) neighbors.push(idx - 1);
-    if (col < gridSize - 1) neighbors.push(idx + 1);
-    return neighbors;
+  function buildBoard() {
+    boardEl.innerHTML = '';
+    boardEl.style.width = boardSize + 'px';
+    boardEl.style.height = boardSize + 'px';
+    boardEl.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    boardEl.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        const cell = document.createElement('div');
+        cell.className = 'board-cell';
+        cell.dataset.row = row;
+        cell.dataset.col = col;
+        // Faint guide showing where this piece belongs
+        cell.style.backgroundImage = `url(${imageDataURL})`;
+        cell.style.backgroundSize = `${boardSize}px ${boardSize}px`;
+        cell.style.backgroundPosition = `${-col * pieceSize}px ${-row * pieceSize}px`;
+        cell.addEventListener('click', onBoardCellClick);
+        boardEl.appendChild(cell);
+      }
+    }
   }
 
+  function buildTray() {
+    trayEl.innerHTML = '';
+
+    // Shuffle piece order
+    const pieceIds = [];
+    for (let i = 0; i < totalPieces; i++) pieceIds.push(i);
+    for (let i = pieceIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pieceIds[i], pieceIds[j]] = [pieceIds[j], pieceIds[i]];
+    }
+
+    const scaledBgSize = gridSize * trayPieceSize;
+
+    pieceIds.forEach(id => {
+      const row = Math.floor(id / gridSize);
+      const col = id % gridSize;
+      const piece = document.createElement('div');
+      piece.className = 'tray-piece';
+      piece.dataset.id = id;
+      piece.style.width = trayPieceSize + 'px';
+      piece.style.height = trayPieceSize + 'px';
+      piece.style.backgroundImage = `url(${imageDataURL})`;
+      piece.style.backgroundSize = `${scaledBgSize}px ${scaledBgSize}px`;
+      piece.style.backgroundPosition = `${-col * trayPieceSize}px ${-row * trayPieceSize}px`;
+      piece.addEventListener('pointerdown', onPiecePointerDown);
+      trayEl.appendChild(piece);
+    });
+  }
+
+  // --- Interaction: drag and tap-to-place ---
+  function onPiecePointerDown(e) {
+    e.preventDefault();
+    const piece = e.currentTarget;
+    const id = parseInt(piece.dataset.id, 10);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let isDragging = false;
+    let clone = null;
+
+    const onMove = (ev) => {
+      ev.preventDefault();
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+
+      if (!isDragging && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        isDragging = true;
+        const row = Math.floor(id / gridSize);
+        const col = id % gridSize;
+        clone = document.createElement('div');
+        clone.className = 'drag-clone';
+        clone.style.width = pieceSize + 'px';
+        clone.style.height = pieceSize + 'px';
+        clone.style.backgroundImage = `url(${imageDataURL})`;
+        clone.style.backgroundSize = `${boardSize}px ${boardSize}px`;
+        clone.style.backgroundPosition = `${-col * pieceSize}px ${-row * pieceSize}px`;
+        document.body.appendChild(clone);
+        piece.classList.add('dragging');
+        // Deselect any selected piece
+        if (selectedPieceEl) {
+          selectedPieceEl.classList.remove('selected');
+          selectedPieceEl = null;
+        }
+      }
+
+      if (isDragging && clone) {
+        clone.style.left = (ev.clientX - pieceSize / 2) + 'px';
+        clone.style.top = (ev.clientY - pieceSize / 2) + 'px';
+      }
+    };
+
+    const onUp = (ev) => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+
+      if (isDragging && clone) {
+        clone.remove();
+        piece.classList.remove('dragging');
+        const cell = findBoardCellAt(ev.clientX, ev.clientY);
+        if (cell) {
+          tryPlacePiece(id, cell, piece);
+        }
+      } else {
+        // Tap: toggle selection
+        if (selectedPieceEl === piece) {
+          piece.classList.remove('selected');
+          selectedPieceEl = null;
+        } else {
+          if (selectedPieceEl) selectedPieceEl.classList.remove('selected');
+          piece.classList.add('selected');
+          selectedPieceEl = piece;
+        }
+      }
+    };
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  }
+
+  function onBoardCellClick(e) {
+    if (!selectedPieceEl) return;
+    const cell = e.currentTarget;
+    if (cell.classList.contains('filled')) return;
+
+    const pieceId = parseInt(selectedPieceEl.dataset.id, 10);
+    const pieceEl = selectedPieceEl;
+    selectedPieceEl.classList.remove('selected');
+    selectedPieceEl = null;
+    tryPlacePiece(pieceId, cell, pieceEl);
+  }
+
+  function findBoardCellAt(clientX, clientY) {
+    const cells = boardEl.querySelectorAll('.board-cell:not(.filled)');
+    for (const cell of cells) {
+      const rect = cell.getBoundingClientRect();
+      if (clientX >= rect.left && clientX <= rect.right &&
+          clientY >= rect.top && clientY <= rect.bottom) {
+        return cell;
+      }
+    }
+    return null;
+  }
+
+  function tryPlacePiece(pieceId, cell, pieceEl) {
+    const targetRow = parseInt(cell.dataset.row, 10);
+    const targetCol = parseInt(cell.dataset.col, 10);
+    const targetId = targetRow * gridSize + targetCol;
+
+    moves++;
+    movesEl.textContent = `Moves: ${moves}`;
+
+    if (pieceId === targetId) {
+      // Correct placement
+      cell.classList.add('filled');
+      cell.classList.add('just-placed');
+      setTimeout(() => cell.classList.remove('just-placed'), 500);
+      pieceEl.remove();
+      placedCount++;
+
+      if (selectedPieceEl === pieceEl) {
+        selectedPieceEl = null;
+      }
+
+      if (placedCount === totalPieces) {
+        onWin();
+      }
+    } else {
+      // Wrong spot - shake the cell
+      cell.classList.add('wrong');
+      setTimeout(() => cell.classList.remove('wrong'), 400);
+    }
+  }
+
+  // --- Win ---
+  function onWin() {
+    clearInterval(timerInterval);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const min = Math.floor(elapsed / 60);
+    const sec = elapsed % 60;
+    const winStats = document.getElementById('win-stats');
+    winStats.textContent = `${moves} moves in ${min}:${sec.toString().padStart(2, '0')}`;
+    setTimeout(() => {
+      winEl.style.display = 'flex';
+    }, 500);
+  }
+
+  // --- Timer ---
   function updateTimer() {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const min = Math.floor(elapsed / 60);
@@ -555,159 +724,16 @@
     timerEl.textContent = `Time: ${min}:${sec.toString().padStart(2, '0')}`;
   }
 
-  function drawPuzzle() {
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvasSize, canvasSize);
-
-    const total = gridSize * gridSize;
-    for (let i = 0; i < total; i++) {
-      if (tiles[i] === -1) continue; // empty slot
-
-      const destRow = Math.floor(i / gridSize);
-      const destCol = i % gridSize;
-      const srcRow = Math.floor(tiles[i] / gridSize);
-      const srcCol = tiles[i] % gridSize;
-
-      ctx.drawImage(
-        sourceCanvas,
-        srcCol * tileSize, srcRow * tileSize, tileSize, tileSize,
-        destCol * tileSize, destRow * tileSize, tileSize, tileSize
-      );
-
-      // Tile border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(destCol * tileSize + 1, destRow * tileSize + 1, tileSize - 2, tileSize - 2);
-    }
-
-    // Draw empty slot
-    ctx.fillStyle = '#0f1525';
-    const eRow = Math.floor(emptyIdx / gridSize);
-    const eCol = emptyIdx % gridSize;
-    ctx.fillRect(eCol * tileSize, eRow * tileSize, tileSize, tileSize);
-  }
-
+  // --- Hint: briefly show the full image on the board ---
   function showHint() {
     if (showingHint) return;
     showingHint = true;
-    ctx.drawImage(sourceCanvas, 0, 0);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(0, 0, canvasSize, canvasSize);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 1.2rem sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Full picture', canvasSize / 2, canvasSize / 2);
+    const cells = boardEl.querySelectorAll('.board-cell');
+    cells.forEach(cell => cell.classList.add('hint-show'));
     clearTimeout(hintTimeout);
     hintTimeout = setTimeout(() => {
       showingHint = false;
-      drawPuzzle();
+      cells.forEach(cell => cell.classList.remove('hint-show'));
     }, 1500);
-  }
-
-  // --- Input ---
-  function handleClick(px, py) {
-    if (showingHint) return;
-    const col = Math.floor(px / tileSize);
-    const row = Math.floor(py / tileSize);
-    const idx = row * gridSize + col;
-
-    if (idx < 0 || idx >= gridSize * gridSize) return;
-
-    const neighbors = getMovableNeighbors(emptyIdx);
-    if (neighbors.includes(idx)) {
-      tiles[emptyIdx] = tiles[idx];
-      tiles[idx] = -1;
-      emptyIdx = idx;
-      moves++;
-      movesEl.textContent = `Moves: ${moves}`;
-      drawPuzzle();
-      checkWin();
-    }
-  }
-
-  function getCanvasPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    let clientX, clientY;
-    if (e.touches) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
-    };
-  }
-
-  // Attach events after canvas exists (deferred)
-  let lastTouchTime = 0;
-  function attachEvents() {
-    canvas = document.getElementById('puzzle-canvas');
-    canvas.addEventListener('click', (e) => {
-      // Skip click if a touch just fired (prevents double-handling)
-      if (Date.now() - lastTouchTime < 300) return;
-      const pos = getCanvasPos(e);
-      handleClick(pos.x, pos.y);
-    });
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      lastTouchTime = Date.now();
-      const pos = getCanvasPos(e);
-      handleClick(pos.x, pos.y);
-    }, { passive: false });
-  }
-  attachEvents();
-
-  // Handle window resize (orientation change, address bar hide/show)
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (gameEl.style.display === 'none' || !canvas || !sourceCanvas) return;
-      const maxSize = Math.min(window.innerWidth - 20, window.innerHeight - 80, 500);
-      canvasSize = Math.floor(maxSize / gridSize) * gridSize;
-      canvas.width = canvasSize;
-      canvas.height = canvasSize;
-      tileSize = canvasSize / gridSize;
-      sourceCanvas.width = canvasSize;
-      sourceCanvas.height = canvasSize;
-      try {
-        pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
-      } catch (e) {
-        const sctx = sourceCanvas.getContext('2d');
-        const grad = sctx.createLinearGradient(0, 0, canvasSize, canvasSize);
-        grad.addColorStop(0, '#e94560');
-        grad.addColorStop(0.5, '#f5c518');
-        grad.addColorStop(1, '#4ecca3');
-        sctx.fillStyle = grad;
-        sctx.fillRect(0, 0, canvasSize, canvasSize);
-      }
-      drawPuzzle();
-    }, 150);
-  });
-
-  function checkWin() {
-    const total = gridSize * gridSize;
-    for (let i = 0; i < total - 1; i++) {
-      if (tiles[i] !== i) return;
-    }
-    // Won!
-    clearInterval(timerInterval);
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const min = Math.floor(elapsed / 60);
-    const sec = elapsed % 60;
-
-    // Draw complete image
-    ctx.drawImage(sourceCanvas, 0, 0);
-
-    const winStats = document.getElementById('win-stats');
-    winStats.textContent = `${moves} moves in ${min}:${sec.toString().padStart(2, '0')}`;
-    setTimeout(() => {
-      winEl.style.display = 'flex';
-    }, 500);
   }
 })();
