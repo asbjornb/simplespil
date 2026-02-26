@@ -472,8 +472,8 @@
     gameEl.style.display = 'flex';
     winEl.style.display = 'none';
 
-    // Calculate canvas size
-    const maxSize = Math.min(window.innerWidth - 40, window.innerHeight - 100, 500);
+    // Calculate canvas size (account for HUD and safe area on mobile)
+    const maxSize = Math.min(window.innerWidth - 20, window.innerHeight - 80, 500);
     canvasSize = Math.floor(maxSize / gridSize) * gridSize;
     canvas.width = canvasSize;
     canvas.height = canvasSize;
@@ -634,6 +634,24 @@
     });
   }
   attachEvents();
+
+  // Handle window resize (orientation change, address bar hide/show)
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (gameEl.style.display === 'none' || !canvas || !sourceCanvas) return;
+      const maxSize = Math.min(window.innerWidth - 20, window.innerHeight - 80, 500);
+      canvasSize = Math.floor(maxSize / gridSize) * gridSize;
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      tileSize = canvasSize / gridSize;
+      sourceCanvas.width = canvasSize;
+      sourceCanvas.height = canvasSize;
+      pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+      drawPuzzle();
+    }, 150);
+  });
 
   function checkWin() {
     const total = gridSize * gridSize;
