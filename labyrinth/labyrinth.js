@@ -92,6 +92,7 @@
   });
 
   function startGame() {
+    SimplespilStats.recordPlay('labyrinth');
     canvas = document.getElementById('maze-canvas');
     ctx = canvas.getContext('2d');
     menuEl.style.display = 'none';

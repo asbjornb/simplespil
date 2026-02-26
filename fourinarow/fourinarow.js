@@ -486,6 +486,7 @@
   }
 
   function startGame(bot) {
+    SimplespilStats.recordPlay('fourinarow');
     vsBot = bot;
     menuEl.style.display = 'none';
     gameEl.style.display = 'flex';

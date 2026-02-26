@@ -436,6 +436,7 @@
   }
 
   function startGame() {
+    SimplespilStats.recordPlay('jump');
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
     resizeCanvas();

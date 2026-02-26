@@ -473,6 +473,7 @@
   document.getElementById('hint-btn').addEventListener('click', showHint);
 
   function startGame() {
+    SimplespilStats.recordPlay('puzzle');
     // Reset hint state from any previous game
     showingHint = false;
     clearTimeout(hintTimeout);

@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  SimplespilStats.recordPlay('dressup');
 
   // --- Item definitions ---
   // Each category has items. Index 0 = "none" for optional categories.
