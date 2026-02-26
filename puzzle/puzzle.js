@@ -466,6 +466,7 @@
   document.getElementById('hint-btn').addEventListener('click', showHint);
 
   function startGame() {
+    SimplespilStats.recordPlay('puzzle');
     canvas = document.getElementById('puzzle-canvas');
     ctx = canvas.getContext('2d');
     menuEl.style.display = 'none';

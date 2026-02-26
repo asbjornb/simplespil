@@ -99,6 +99,12 @@
       line-height: 1.4;
     }
 
+    .play-count {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      opacity: 0.7;
+    }
+
     @media (max-width: 600px) {
       .home h1 { font-size: 2rem; }
       .game-cards {
@@ -115,7 +121,7 @@
     <p class="tagline">Simple games for kids. No ads. No internet needed.</p>
 
     <div class="game-cards">
-      <a href="jump/index.html" class="game-card">
+      <a href="jump/index.html" class="game-card" data-game="jump">
         <div class="game-icon">
           <canvas id="icon-jump" width="60" height="60"></canvas>
         </div>
@@ -123,7 +129,7 @@
         <p>Run and jump over obstacles as a dinosaur, unicorn, or hamster</p>
       </a>
 
-      <a href="puzzle/index.html" class="game-card">
+      <a href="puzzle/index.html" class="game-card" data-game="puzzle">
         <div class="game-icon">
           <canvas id="icon-puzzle" width="60" height="60"></canvas>
         </div>
@@ -131,7 +137,7 @@
         <p>Slide pieces to complete beautiful pictures</p>
       </a>
 
-      <a href="labyrinth/index.html" class="game-card">
+      <a href="labyrinth/index.html" class="game-card" data-game="labyrinth">
         <div class="game-icon">
           <canvas id="icon-maze" width="60" height="60"></canvas>
         </div>
@@ -139,7 +145,7 @@
         <p>Find your way through the maze to reach the star</p>
       </a>
 
-      <a href="fourinarow/index.html" class="game-card">
+      <a href="fourinarow/index.html" class="game-card" data-game="fourinarow">
         <div class="game-icon">
           <canvas id="icon-four" width="60" height="60"></canvas>
         </div>
@@ -147,7 +153,7 @@
         <p>Drop pieces to connect four in a row, column, or diagonal</p>
       </a>
 
-      <a href="dressup/index.html" class="game-card">
+      <a href="dressup/index.html" class="game-card" data-game="dressup">
         <div class="game-icon">
           <canvas id="icon-dressup" width="60" height="60"></canvas>
         </div>
@@ -157,6 +163,19 @@
     </div>
   </div>
 
+  <script src="shared/stats.js"></script>
+  <script>
+    // Show play counts on game cards
+    document.querySelectorAll('.game-card[data-game]').forEach(card => {
+      const count = SimplespilStats.getCount(card.dataset.game);
+      if (count > 0) {
+        const span = document.createElement('span');
+        span.className = 'play-count';
+        span.textContent = `played ${count} time${count === 1 ? '' : 's'}`;
+        card.appendChild(span);
+      }
+    });
+  </script>
   <script>
     // Draw mini icons on the home page
     (() => {
