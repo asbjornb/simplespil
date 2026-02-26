@@ -70,6 +70,7 @@
     .game-card:nth-child(3) { border-color: var(--color-blue); }
     .game-card:nth-child(4) { border-color: var(--color-accent); }
     .game-card:nth-child(5) { border-color: var(--color-pink); }
+    .game-card:nth-child(6) { border-color: var(--color-purple); }
 
     .game-icon {
       font-size: 3rem;
@@ -86,6 +87,7 @@
     .game-card:nth-child(3) .game-icon { background: rgba(52, 152, 219, 0.15); }
     .game-card:nth-child(4) .game-icon { background: rgba(245, 197, 24, 0.15); }
     .game-card:nth-child(5) .game-icon { background: rgba(233, 30, 143, 0.15); }
+    .game-card:nth-child(6) .game-icon { background: rgba(155, 89, 182, 0.15); }
 
     .game-card h2 {
       font-size: 1.3rem;
@@ -159,6 +161,14 @@
         </div>
         <h2>Dress Up</h2>
         <p>Style a character and share your design with friends</p>
+      </a>
+
+      <a href="tetris/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-tetris" width="60" height="60"></canvas>
+        </div>
+        <h2>Tetris</h2>
+        <p>Stack falling blocks and clear lines</p>
       </a>
     </div>
   </div>
@@ -341,6 +351,45 @@
         ctx.fillStyle = '#e94560';
         ctx.fillRect(21, 54, 10, 4);
         ctx.fillRect(29, 54, 10, 4);
+      }
+      // Tetris icon - mini tetris blocks
+      const tc = document.getElementById('icon-tetris');
+      if (tc) {
+        const ctx = tc.getContext('2d');
+        const b = 9; // block size
+        const drawB = (x, y, color) => {
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y, b - 1, b - 1);
+          ctx.fillStyle = 'rgba(255,255,255,0.25)';
+          ctx.fillRect(x, y, b - 1, 2);
+          ctx.fillRect(x, y, 2, b - 1);
+        };
+        // T piece
+        drawB(12, 38, '#9b59b6');
+        drawB(21, 38, '#9b59b6');
+        drawB(30, 38, '#9b59b6');
+        drawB(21, 29, '#9b59b6');
+        // L piece
+        drawB(3, 47, '#f39c12');
+        drawB(3, 38, '#f39c12');
+        drawB(3, 29, '#f39c12');
+        drawB(12, 47, '#f39c12');
+        // S piece
+        drawB(39, 47, '#4ecca3');
+        drawB(48, 47, '#4ecca3');
+        drawB(48, 38, '#4ecca3');
+        drawB(39, 38, '#e94560');
+        // I piece (falling)
+        drawB(21, 5, '#3498db');
+        drawB(21, 14, '#3498db');
+        drawB(21, 23, '#3498db');
+        // Bottom row fill
+        drawB(3, 47, '#f39c12');
+        drawB(12, 47, '#f39c12');
+        drawB(21, 47, '#f5c518');
+        drawB(30, 47, '#f5c518');
+        drawB(39, 47, '#4ecca3');
+        drawB(48, 47, '#4ecca3');
       }
     })();
   </script>

@@ -427,7 +427,14 @@
     const c = document.createElement('canvas');
     c.width = 90;
     c.height = 90;
-    pic.draw(c.getContext('2d'), 90, 90);
+    try {
+      pic.draw(c.getContext('2d'), 90, 90);
+    } catch (e) {
+      // Fallback: fill with a color so the button is still usable
+      const fallbackCtx = c.getContext('2d');
+      fallbackCtx.fillStyle = ['#e94560', '#4ecca3', '#3498db', '#f5c518', '#9b59b6', '#f39c12'][i % 6];
+      fallbackCtx.fillRect(0, 0, 90, 90);
+    }
     btn.appendChild(c);
     const label = document.createElement('div');
     label.style.cssText = 'font-size:0.7rem;color:var(--color-text-muted);margin-top:2px;';
@@ -467,6 +474,10 @@
 
   function startGame() {
     SimplespilStats.recordPlay('puzzle');
+    // Reset hint state from any previous game
+    showingHint = false;
+    clearTimeout(hintTimeout);
+
     canvas = document.getElementById('puzzle-canvas');
     ctx = canvas.getContext('2d');
     menuEl.style.display = 'none';
@@ -484,7 +495,18 @@
     sourceCanvas = document.createElement('canvas');
     sourceCanvas.width = canvasSize;
     sourceCanvas.height = canvasSize;
-    pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+    try {
+      pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+    } catch (e) {
+      // Fallback: draw a colored gradient so the game is still playable
+      const sctx = sourceCanvas.getContext('2d');
+      const grad = sctx.createLinearGradient(0, 0, canvasSize, canvasSize);
+      grad.addColorStop(0, '#e94560');
+      grad.addColorStop(0.5, '#f5c518');
+      grad.addColorStop(1, '#4ecca3');
+      sctx.fillStyle = grad;
+      sctx.fillRect(0, 0, canvasSize, canvasSize);
+    }
 
     // Create tiles (last tile is empty)
     const total = gridSize * gridSize;
@@ -622,17 +644,21 @@
   }
 
   // Attach events after canvas exists (deferred)
+  let lastTouchTime = 0;
   function attachEvents() {
     canvas = document.getElementById('puzzle-canvas');
     canvas.addEventListener('click', (e) => {
+      // Skip click if a touch just fired (prevents double-handling)
+      if (Date.now() - lastTouchTime < 300) return;
       const pos = getCanvasPos(e);
       handleClick(pos.x, pos.y);
     });
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      lastTouchTime = Date.now();
       const pos = getCanvasPos(e);
       handleClick(pos.x, pos.y);
-    });
+    }, { passive: false });
   }
   attachEvents();
 
@@ -649,7 +675,17 @@
       tileSize = canvasSize / gridSize;
       sourceCanvas.width = canvasSize;
       sourceCanvas.height = canvasSize;
-      pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+      try {
+        pictures[selectedPic].draw(sourceCanvas.getContext('2d'), canvasSize, canvasSize);
+      } catch (e) {
+        const sctx = sourceCanvas.getContext('2d');
+        const grad = sctx.createLinearGradient(0, 0, canvasSize, canvasSize);
+        grad.addColorStop(0, '#e94560');
+        grad.addColorStop(0.5, '#f5c518');
+        grad.addColorStop(1, '#4ecca3');
+        sctx.fillStyle = grad;
+        sctx.fillRect(0, 0, canvasSize, canvasSize);
+      }
       drawPuzzle();
     }, 150);
   });
