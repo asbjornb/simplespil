@@ -16,9 +16,9 @@
     <div class="picture-select" id="picture-select"></div>
     <p class="subtitle">Difficulty</p>
     <div class="difficulty-select">
+      <button class="diff-btn" data-grid="2">2x2</button>
       <button class="diff-btn selected" data-grid="3">3x3</button>
       <button class="diff-btn" data-grid="4">4x4</button>
-      <button class="diff-btn" data-grid="5">5x5</button>
     </div>
     <button class="btn btn-green" id="start-btn">Play!</button>
   </div>
@@ -30,7 +30,8 @@
       <button class="btn btn-accent hint-btn" id="hint-btn">Hint</button>
     </div>
     <div class="puzzle-area">
-      <canvas id="puzzle-canvas"></canvas>
+      <div class="puzzle-board" id="puzzle-board"></div>
+      <div class="piece-tray" id="piece-tray"></div>
     </div>
     <div id="win-screen" class="win-screen" style="display:none;">
       <h2>Well Done!</h2>
