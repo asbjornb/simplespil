@@ -1,9 +1,13 @@
+html, body {
+  overflow-y: auto;
+}
+
 .menu {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   gap: 16px;
   padding: 20px;
 }
@@ -90,28 +94,30 @@
   border-radius: var(--radius);
   max-width: 100%;
   max-height: 100%;
+  touch-action: none;
 }
 
 /* D-pad for mobile */
 .dpad {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   display: none;
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   z-index: 100;
 }
 
 .dpad-btn {
   position: absolute;
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   background: rgba(52, 152, 219, 0.6);
   border: 2px solid rgba(52, 152, 219, 0.8);
-  border-radius: 10px;
+  border-radius: 12px;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -134,7 +140,7 @@
     display: block;
   }
   .maze-area {
-    padding-bottom: 170px;
+    padding-bottom: 190px;
   }
 }
 
@@ -152,6 +158,8 @@
   gap: 12px;
   box-shadow: var(--shadow);
   z-index: 200;
+  max-width: 90vw;
+  width: 320px;
 }
 
 .win-screen h2 {

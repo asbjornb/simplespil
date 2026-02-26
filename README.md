@@ -2,15 +2,19 @@
 
 Simple offline games for kids - no ads, no internet required, just fun.
 
+## Play Now
+
+**[Play all games here](https://asbjornb.github.io/simplespil/)**
+
 ## Games
 
-### Jump Game
+### [Jump Game](jump/)
 A side-scrolling arcade game inspired by the Chrome offline dinosaur game. Players choose their character - a dinosaur, unicorn, or hamster - and jump over obstacles to get the highest score.
 
-### Puzzle Game
+### [Puzzle Game](puzzle/)
 A jigsaw-style puzzle game where kids drag and drop pieces to complete pictures. Multiple images and difficulty levels to keep things interesting.
 
-### Labyrinth Game
+### [Labyrinth Game](labyrinth/)
 Navigate through a maze to reach the goal. Tilt-friendly controls on mobile, arrow keys on desktop. Randomly generated mazes so every game is different.
 
 ## How to Play
