@@ -65,12 +65,12 @@
       box-shadow: var(--shadow);
     }
 
-    .game-card:nth-child(1) { border-color: var(--color-primary); }
-    .game-card:nth-child(2) { border-color: var(--color-green); }
-    .game-card:nth-child(3) { border-color: var(--color-blue); }
-    .game-card:nth-child(4) { border-color: var(--color-accent); }
-    .game-card:nth-child(5) { border-color: var(--color-pink); }
-    .game-card:nth-child(6) { border-color: var(--color-purple); }
+    .game-card[data-color="primary"] { border-color: var(--color-primary); }
+    .game-card[data-color="green"] { border-color: var(--color-green); }
+    .game-card[data-color="blue"] { border-color: var(--color-blue); }
+    .game-card[data-color="accent"] { border-color: var(--color-accent); }
+    .game-card[data-color="pink"] { border-color: var(--color-pink); }
+    .game-card[data-color="purple"] { border-color: var(--color-purple); }
 
     .game-icon {
       font-size: 3rem;
@@ -82,12 +82,12 @@
       border-radius: 50%;
     }
 
-    .game-card:nth-child(1) .game-icon { background: rgba(233, 69, 96, 0.15); }
-    .game-card:nth-child(2) .game-icon { background: rgba(78, 204, 163, 0.15); }
-    .game-card:nth-child(3) .game-icon { background: rgba(52, 152, 219, 0.15); }
-    .game-card:nth-child(4) .game-icon { background: rgba(245, 197, 24, 0.15); }
-    .game-card:nth-child(5) .game-icon { background: rgba(233, 30, 143, 0.15); }
-    .game-card:nth-child(6) .game-icon { background: rgba(155, 89, 182, 0.15); }
+    .game-card[data-color="primary"] .game-icon { background: rgba(233, 69, 96, 0.15); }
+    .game-card[data-color="green"] .game-icon { background: rgba(78, 204, 163, 0.15); }
+    .game-card[data-color="blue"] .game-icon { background: rgba(52, 152, 219, 0.15); }
+    .game-card[data-color="accent"] .game-icon { background: rgba(245, 197, 24, 0.15); }
+    .game-card[data-color="pink"] .game-icon { background: rgba(233, 30, 143, 0.15); }
+    .game-card[data-color="purple"] .game-icon { background: rgba(155, 89, 182, 0.15); }
 
     .game-card h2 {
       font-size: 1.3rem;
@@ -123,7 +123,7 @@
     <p class="tagline">Simple games for kids. No ads. No internet needed.</p>
 
     <div class="game-cards">
-      <a href="jump/index.html" class="game-card" data-game="jump">
+      <a href="jump/index.html" class="game-card" data-game="jump" data-color="primary">
         <div class="game-icon">
           <canvas id="icon-jump" width="60" height="60"></canvas>
         </div>
@@ -131,7 +131,7 @@
         <p>Run and jump over obstacles as a dinosaur, unicorn, or hamster</p>
       </a>
 
-      <a href="puzzle/index.html" class="game-card" data-game="puzzle">
+      <a href="puzzle/index.html" class="game-card" data-game="puzzle" data-color="green">
         <div class="game-icon">
           <canvas id="icon-puzzle" width="60" height="60"></canvas>
         </div>
@@ -139,7 +139,7 @@
         <p>Slide pieces to complete beautiful pictures</p>
       </a>
 
-      <a href="labyrinth/index.html" class="game-card" data-game="labyrinth">
+      <a href="labyrinth/index.html" class="game-card" data-game="labyrinth" data-color="blue">
         <div class="game-icon">
           <canvas id="icon-maze" width="60" height="60"></canvas>
         </div>
@@ -147,7 +147,7 @@
         <p>Find your way through the maze to reach the star</p>
       </a>
 
-      <a href="fourinarow/index.html" class="game-card" data-game="fourinarow">
+      <a href="fourinarow/index.html" class="game-card" data-game="fourinarow" data-color="accent">
         <div class="game-icon">
           <canvas id="icon-four" width="60" height="60"></canvas>
         </div>
@@ -155,7 +155,7 @@
         <p>Drop pieces to connect four in a row, column, or diagonal</p>
       </a>
 
-      <a href="dressup/index.html" class="game-card" data-game="dressup">
+      <a href="dressup/index.html" class="game-card" data-game="dressup" data-color="pink">
         <div class="game-icon">
           <canvas id="icon-dressup" width="60" height="60"></canvas>
         </div>
@@ -163,7 +163,7 @@
         <p>Style a character and share your design with friends</p>
       </a>
 
-      <a href="tetris/index.html" class="game-card">
+      <a href="tetris/index.html" class="game-card" data-game="tetris" data-color="purple">
         <div class="game-icon">
           <canvas id="icon-tetris" width="60" height="60"></canvas>
         </div>
@@ -175,8 +175,12 @@
 
   <script src="shared/stats.js"></script>
   <script>
-    // Show play counts on game cards
-    document.querySelectorAll('.game-card[data-game]').forEach(card => {
+    // Sort game cards by most played, then show play counts
+    const grid = document.querySelector('.game-cards');
+    const cards = [...grid.querySelectorAll('.game-card[data-game]')];
+    cards.sort((a, b) => SimplespilStats.getCount(b.dataset.game) - SimplespilStats.getCount(a.dataset.game));
+    cards.forEach(card => {
+      grid.appendChild(card);
       const count = SimplespilStats.getCount(card.dataset.game);
       if (count > 0) {
         const span = document.createElement('span');
