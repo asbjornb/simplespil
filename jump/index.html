@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Jump! - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="jump.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Jump!</h1>
+    <p class="subtitle">Choose your character</p>
+    <div class="character-select">
+      <button class="char-btn selected" data-char="dino" id="btn-dino">
+        <canvas class="char-preview" id="preview-dino" width="80" height="80"></canvas>
+        <span>Dinosaur</span>
+      </button>
+      <button class="char-btn" data-char="unicorn" id="btn-unicorn">
+        <canvas class="char-preview" id="preview-unicorn" width="80" height="80"></canvas>
+        <span>Unicorn</span>
+      </button>
+      <button class="char-btn" data-char="hamster" id="btn-hamster">
+        <canvas class="char-preview" id="preview-hamster" width="80" height="80"></canvas>
+        <span>Hamster</span>
+      </button>
+    </div>
+    <button class="btn btn-primary" id="start-btn">Play!</button>
+    <p class="high-score-display" id="menu-high-score"></p>
+  </div>
+
+  <div id="game" class="game-container" style="display:none;">
+    <div class="hud">
+      <span id="score-display">Score: 0</span>
+      <span id="high-score-display">Best: 0</span>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <div id="game-over" class="game-over" style="display:none;">
+      <h2>Game Over!</h2>
+      <p id="final-score"></p>
+      <p id="new-high" style="display:none;">New High Score!</p>
+      <button class="btn btn-primary" id="restart-btn">Play Again</button>
+      <button class="btn btn-accent" id="menu-btn">Change Character</button>
+    </div>
+  </div>
+
+  <script src="jump.js"></script>
+</body>
+</html>

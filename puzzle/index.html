@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Puzzle - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="puzzle.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Puzzle</h1>
+    <p class="subtitle">Choose a picture</p>
+    <div class="picture-select" id="picture-select"></div>
+    <p class="subtitle">Difficulty</p>
+    <div class="difficulty-select">
+      <button class="diff-btn selected" data-grid="3">3x3</button>
+      <button class="diff-btn" data-grid="4">4x4</button>
+      <button class="diff-btn" data-grid="5">5x5</button>
+    </div>
+    <button class="btn btn-green" id="start-btn">Play!</button>
+  </div>
+
+  <div id="game" class="game-container" style="display:none;">
+    <div class="puzzle-hud">
+      <span id="moves-display">Moves: 0</span>
+      <span id="timer-display">Time: 0:00</span>
+      <button class="btn btn-accent hint-btn" id="hint-btn">Hint</button>
+    </div>
+    <div class="puzzle-area">
+      <canvas id="puzzle-canvas"></canvas>
+    </div>
+    <div id="win-screen" class="win-screen" style="display:none;">
+      <h2>Well Done!</h2>
+      <p id="win-stats"></p>
+      <button class="btn btn-green" id="next-btn">Next Puzzle</button>
+      <button class="btn btn-accent" id="menu-btn-win">Pick New Picture</button>
+    </div>
+  </div>
+
+  <script src="puzzle.js"></script>
+</body>
+</html>

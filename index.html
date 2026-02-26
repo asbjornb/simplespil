@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Simplespil - Games for Kids</title>
+  <link rel="stylesheet" href="shared/style.css">
+  <style>
+    body {
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 24px;
+      padding: 32px 20px;
+    }
+
+    .home h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      color: var(--color-text-muted);
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .game-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 700px;
+    }
+
+    .game-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: var(--color-surface);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      text-decoration: none;
+      color: var(--color-text);
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 180px;
+      border: 2px solid transparent;
+    }
+
+    .game-card:hover, .game-card:active {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: var(--shadow);
+    }
+
+    .game-card:nth-child(1) { border-color: var(--color-primary); }
+    .game-card:nth-child(2) { border-color: var(--color-green); }
+    .game-card:nth-child(3) { border-color: var(--color-blue); }
+
+    .game-icon {
+      font-size: 3rem;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .game-card:nth-child(1) .game-icon { background: rgba(233, 69, 96, 0.15); }
+    .game-card:nth-child(2) .game-icon { background: rgba(78, 204, 163, 0.15); }
+    .game-card:nth-child(3) .game-icon { background: rgba(52, 152, 219, 0.15); }
+
+    .game-card h2 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .game-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 600px) {
+      .home h1 { font-size: 2rem; }
+      .game-card { width: 160px; padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <h1>Simplespil</h1>
+    <p class="tagline">Simple games for kids. No ads. No internet needed.</p>
+
+    <div class="game-cards">
+      <a href="jump/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-jump" width="60" height="60"></canvas>
+        </div>
+        <h2>Jump!</h2>
+        <p>Run and jump over obstacles as a dinosaur, unicorn, or hamster</p>
+      </a>
+
+      <a href="puzzle/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-puzzle" width="60" height="60"></canvas>
+        </div>
+        <h2>Puzzle</h2>
+        <p>Slide pieces to complete beautiful pictures</p>
+      </a>
+
+      <a href="labyrinth/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-maze" width="60" height="60"></canvas>
+        </div>
+        <h2>Labyrinth</h2>
+        <p>Find your way through the maze to reach the star</p>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Draw mini icons on the home page
+    (() => {
+      // Jump icon - little dinosaur
+      const jc = document.getElementById('icon-jump');
+      if (jc) {
+        const ctx = jc.getContext('2d');
+        ctx.fillStyle = '#4ecca3';
+        ctx.beginPath();
+        ctx.ellipse(28, 30, 18, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(44, 18, 10, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(48, 15, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#1a1a2e';
+        ctx.beginPath();
+        ctx.arc(49, 15, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#3ba88a';
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(20 + i * 8, 16);
+          ctx.lineTo(23 + i * 8, 10);
+          ctx.lineTo(26 + i * 8, 16);
+          ctx.fill();
+        }
+        ctx.fillRect(22, 42, 5, 12);
+        ctx.fillRect(34, 42, 5, 12);
+      }
+
+      // Puzzle icon - 4 puzzle pieces
+      const pc = document.getElementById('icon-puzzle');
+      if (pc) {
+        const ctx = pc.getContext('2d');
+        const colors = ['#e94560', '#f5c518', '#4ecca3', '#3498db'];
+        const positions = [[4, 4], [32, 4], [4, 32], [32, 32]];
+        positions.forEach(([x, y], i) => {
+          ctx.fillStyle = colors[i];
+          ctx.fillRect(x, y, 24, 24);
+          ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, 24, 24);
+        });
+        // Puzzle nubs
+        ctx.fillStyle = colors[0];
+        ctx.beginPath();
+        ctx.arc(28, 16, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = colors[2];
+        ctx.beginPath();
+        ctx.arc(28, 44, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Maze icon - mini maze
+      const mc = document.getElementById('icon-maze');
+      if (mc) {
+        const ctx = mc.getContext('2d');
+        ctx.strokeStyle = '#4a90d9';
+        ctx.lineWidth = 2;
+        // Outer walls
+        ctx.strokeRect(5, 5, 50, 50);
+        // Internal walls
+        const walls = [
+          [5, 18, 22, 18], [18, 5, 18, 15], [30, 12, 30, 30],
+          [18, 30, 30, 30], [40, 18, 40, 42], [18, 42, 40, 42],
+          [48, 30, 55, 30]
+        ];
+        walls.forEach(([x1, y1, x2, y2]) => {
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        });
+        // Player dot
+        ctx.fillStyle = '#4ecca3';
+        ctx.beginPath();
+        ctx.arc(12, 12, 4, 0, Math.PI * 2);
+        ctx.fill();
+        // Goal star
+        ctx.fillStyle = '#f5c518';
+        ctx.beginPath();
+        ctx.arc(48, 48, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    })();
+  </script>
+</body>
+</html>
