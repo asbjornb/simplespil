@@ -1,3 +1,7 @@
+html, body {
+  overflow-y: auto;
+}
+
 .menu {
   display: flex;
   flex-direction: column;
@@ -23,14 +27,16 @@
 
 .pic-btn {
   width: 90px;
-  height: 90px;
   border-radius: var(--radius);
   border: 3px solid transparent;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s;
   overflow: hidden;
   background: var(--color-surface);
-  padding: 0;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pic-btn:hover, .pic-btn:active {
@@ -43,8 +49,9 @@
 }
 
 .pic-btn canvas {
-  width: 100%;
-  height: 100%;
+  width: 82px;
+  height: 82px;
+  border-radius: 8px;
 }
 
 .difficulty-select {
@@ -133,6 +140,8 @@
   gap: 12px;
   box-shadow: var(--shadow);
   z-index: 200;
+  max-width: 90vw;
+  width: 320px;
 }
 
 .win-screen h2 {

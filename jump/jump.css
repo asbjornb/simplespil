@@ -1,9 +1,13 @@
+html, body {
+  overflow-y: auto;
+}
+
 .menu {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   gap: 20px;
   padding: 20px;
 }
@@ -79,6 +83,7 @@
 #game-canvas {
   width: 100%;
   height: 100%;
+  touch-action: none;
 }
 
 .game-over {
@@ -95,6 +100,8 @@
   gap: 12px;
   box-shadow: var(--shadow);
   z-index: 200;
+  max-width: 90vw;
+  width: 320px;
 }
 
 .game-over h2 {
