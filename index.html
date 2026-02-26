@@ -71,6 +71,7 @@
     .game-card:nth-child(4) { border-color: var(--color-accent); }
     .game-card:nth-child(5) { border-color: var(--color-pink); }
     .game-card:nth-child(6) { border-color: var(--color-purple); }
+    .game-card:nth-child(7) { border-color: var(--color-orange); }
 
     .game-icon {
       font-size: 3rem;
@@ -88,6 +89,7 @@
     .game-card:nth-child(4) .game-icon { background: rgba(245, 197, 24, 0.15); }
     .game-card:nth-child(5) .game-icon { background: rgba(233, 30, 143, 0.15); }
     .game-card:nth-child(6) .game-icon { background: rgba(155, 89, 182, 0.15); }
+    .game-card:nth-child(7) .game-icon { background: rgba(243, 156, 18, 0.15); }
 
     .game-card h2 {
       font-size: 1.3rem;
@@ -169,6 +171,14 @@
         </div>
         <h2>Tetris</h2>
         <p>Stack falling blocks and clear lines</p>
+      </a>
+
+      <a href="simon/index.html" class="game-card" data-game="simon">
+        <div class="game-icon">
+          <canvas id="icon-simon" width="60" height="60"></canvas>
+        </div>
+        <h2>Simon Says</h2>
+        <p>Watch the pattern and repeat it from memory</p>
       </a>
     </div>
   </div>
@@ -390,6 +400,45 @@
         drawB(30, 47, '#f5c518');
         drawB(39, 47, '#4ecca3');
         drawB(48, 47, '#4ecca3');
+      }
+      // Simon Says icon - four colored quadrants
+      const sc = document.getElementById('icon-simon');
+      if (sc) {
+        const ctx = sc.getContext('2d');
+        const cx = 30, cy = 30, r = 25, gap = 2;
+        // Green - top left
+        ctx.fillStyle = '#4ecca3';
+        ctx.beginPath();
+        ctx.moveTo(cx - gap, cy - gap);
+        ctx.arc(cx, cy, r, Math.PI, Math.PI * 1.5);
+        ctx.lineTo(cx - gap, cy - gap);
+        ctx.fill();
+        // Red - top right
+        ctx.fillStyle = '#e94560';
+        ctx.beginPath();
+        ctx.moveTo(cx + gap, cy - gap);
+        ctx.arc(cx, cy, r, Math.PI * 1.5, Math.PI * 2);
+        ctx.lineTo(cx + gap, cy - gap);
+        ctx.fill();
+        // Yellow - bottom left
+        ctx.fillStyle = '#f5c518';
+        ctx.beginPath();
+        ctx.moveTo(cx - gap, cy + gap);
+        ctx.arc(cx, cy, r, Math.PI * 0.5, Math.PI);
+        ctx.lineTo(cx - gap, cy + gap);
+        ctx.fill();
+        // Blue - bottom right
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.moveTo(cx + gap, cy + gap);
+        ctx.arc(cx, cy, r, 0, Math.PI * 0.5);
+        ctx.lineTo(cx + gap, cy + gap);
+        ctx.fill();
+        // Center circle
+        ctx.fillStyle = '#1a1a2e';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fill();
       }
     })();
   </script>
