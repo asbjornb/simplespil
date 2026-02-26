@@ -218,6 +218,91 @@
         ctx.quadraticCurveTo(x - w * 0.02, y + h * 0.35, x + w * 0.05, y + h * 0.3);
         ctx.stroke();
       }
+    },
+    slime: {
+      color: '#7bed9f',
+      draw(ctx, x, y, w, h, frame) {
+        const wobble = Math.sin(frame * 0.2) * 2;
+        const squish = Math.sin(frame * 0.15) * 1.5;
+
+        // Drip trails on ground
+        ctx.fillStyle = 'rgba(123, 237, 159, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.25, y + h * 0.95, 4, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.7, y + h * 0.93, 3, 1.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body (blobby shape using overlapping arcs)
+        ctx.fillStyle = '#7bed9f';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.1, y + h * 0.9);
+        ctx.quadraticCurveTo(x - w * 0.02 + wobble, y + h * 0.45, x + w * 0.2, y + h * 0.15 - squish);
+        ctx.quadraticCurveTo(x + w * 0.4, y - h * 0.05 - squish, x + w * 0.55, y + h * 0.1 - squish);
+        ctx.quadraticCurveTo(x + w * 0.75, y + h * 0.02 - squish, x + w * 0.85, y + h * 0.2);
+        ctx.quadraticCurveTo(x + w * 1.02 - wobble, y + h * 0.5, x + w * 0.9, y + h * 0.9);
+        ctx.quadraticCurveTo(x + w * 0.5, y + h * 1.0 + squish, x + w * 0.1, y + h * 0.9);
+        ctx.fill();
+
+        // Body highlight (lighter blob for shine)
+        ctx.fillStyle = 'rgba(170, 255, 200, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.35, y + h * 0.35 - squish, w * 0.18, h * 0.2, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Small drip on right side
+        ctx.fillStyle = '#7bed9f';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.82, y + h * 0.65);
+        ctx.quadraticCurveTo(x + w * 0.88, y + h * 0.7 + Math.sin(frame * 0.25) * 2, x + w * 0.83, y + h * 0.78 + Math.sin(frame * 0.25) * 2);
+        ctx.quadraticCurveTo(x + w * 0.78, y + h * 0.72, x + w * 0.82, y + h * 0.65);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.38, y + h * 0.35 - squish, 9, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.62, y + h * 0.33 - squish, 9, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupils (look slightly forward)
+        ctx.fillStyle = '#1a1a2e';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.41, y + h * 0.37 - squish, 5, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.65, y + h * 0.35 - squish, 5, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye shine
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.36, y + h * 0.31 - squish, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x + w * 0.6, y + h * 0.29 - squish, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Mouth (happy smile)
+        ctx.strokeStyle = '#2d8a56';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.5, y + h * 0.48 - squish, 8, 0.1 * Math.PI, 0.9 * Math.PI);
+        ctx.stroke();
+
+        // Blush spots
+        ctx.fillStyle = 'rgba(255, 150, 180, 0.35)';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.25, y + h * 0.48 - squish, 6, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.75, y + h * 0.46 - squish, 6, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   };
 
