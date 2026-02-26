@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Tetris - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="tetris.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Tetris</h1>
+    <p class="subtitle">Stack blocks and clear lines!</p>
+    <button class="btn btn-primary" id="start-btn">Play!</button>
+    <p class="high-score-display" id="menu-high-score"></p>
+  </div>
+
+  <div id="game" class="game-container" style="display:none;">
+    <div class="game-area">
+      <div class="board-wrap">
+        <canvas id="board-canvas"></canvas>
+      </div>
+      <div class="side-panel">
+        <div class="panel-box">
+          <h3>Next</h3>
+          <canvas id="next-canvas"></canvas>
+        </div>
+        <div class="panel-box">
+          <h3>Score</h3>
+          <div class="value score-value" id="score-value">0</div>
+        </div>
+        <div class="panel-box">
+          <h3>Level</h3>
+          <div class="value level-value" id="level-value">1</div>
+        </div>
+        <div class="panel-box">
+          <h3>Lines</h3>
+          <div class="value lines-value" id="lines-value">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="touch-controls">
+      <div class="touch-row">
+        <button class="touch-btn" id="btn-rotate">&#8635;</button>
+      </div>
+      <div class="touch-row">
+        <button class="touch-btn" id="btn-left">&#9664;</button>
+        <button class="touch-btn" id="btn-down">&#9660;</button>
+        <button class="touch-btn" id="btn-right">&#9654;</button>
+      </div>
+      <div class="touch-row">
+        <button class="touch-btn touch-btn-wide" id="btn-drop">Drop</button>
+      </div>
+    </div>
+
+    <div id="game-over" class="game-over" style="display:none;">
+      <h2>Game Over!</h2>
+      <p id="final-score"></p>
+      <p id="new-high" style="display:none;">New High Score!</p>
+      <button class="btn btn-primary" id="restart-btn">Play Again</button>
+      <button class="btn btn-accent" id="menu-btn">Menu</button>
+    </div>
+  </div>
+
+  <script src="tetris.js"></script>
+</body>
+</html>
