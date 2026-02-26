@@ -106,8 +106,10 @@
     goalC = mazeSize - 1;
     trail = [{ r: 0, c: 0 }];
 
-    // Size canvas
-    const maxSize = Math.min(window.innerWidth - 40, window.innerHeight - 140, 500);
+    // Size canvas (leave more room on touch devices for d-pad)
+    const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    const verticalPadding = isTouchDevice ? 280 : 140;
+    const maxSize = Math.min(window.innerWidth - 40, window.innerHeight - verticalPadding, 500);
     cellSize = Math.floor(maxSize / mazeSize);
     canvasW = cellSize * mazeSize;
     canvasH = cellSize * mazeSize;
@@ -308,10 +310,12 @@
     }
   });
 
-  // D-pad buttons
+  // D-pad buttons with hold-to-repeat
   document.querySelectorAll('.dpad-btn').forEach(btn => {
-    const handler = (e) => {
-      e.preventDefault();
+    let repeatTimer = null;
+    let repeatInterval = null;
+
+    const doMove = () => {
       switch (btn.dataset.dir) {
         case 'up': movePlayer(-1, 0); break;
         case 'down': movePlayer(1, 0); break;
@@ -319,25 +323,99 @@
         case 'right': movePlayer(0, 1); break;
       }
     };
-    btn.addEventListener('touchstart', handler);
-    btn.addEventListener('mousedown', handler);
+
+    const startRepeat = (e) => {
+      e.preventDefault();
+      doMove();
+      // After a short delay, start repeating
+      repeatTimer = setTimeout(() => {
+        repeatInterval = setInterval(doMove, 120);
+      }, 300);
+    };
+
+    const stopRepeat = () => {
+      clearTimeout(repeatTimer);
+      clearInterval(repeatInterval);
+      repeatTimer = null;
+      repeatInterval = null;
+    };
+
+    btn.addEventListener('touchstart', startRepeat);
+    btn.addEventListener('touchend', stopRepeat);
+    btn.addEventListener('touchcancel', stopRepeat);
+    btn.addEventListener('mousedown', startRepeat);
+    btn.addEventListener('mouseup', stopRepeat);
+    btn.addEventListener('mouseleave', stopRepeat);
   });
 
-  // Swipe on canvas
-  let touchStartX = 0, touchStartY = 0;
+  // Tap-to-move on canvas (tap direction relative to player)
   const mazeCanvas = document.getElementById('maze-canvas');
   if (mazeCanvas) {
+    let touchStartX = 0, touchStartY = 0;
+    let touchMoved = false;
+
     mazeCanvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchMoved = false;
+    });
+
+    mazeCanvas.addEventListener('touchmove', (e) => {
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) touchMoved = true;
     });
 
     mazeCanvas.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      const minSwipe = 20;
+      if (touchMoved) {
+        // Swipe: use end position relative to start
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          movePlayer(0, dx > 0 ? 1 : -1);
+        } else {
+          movePlayer(dy > 0 ? 1 : -1, 0);
+        }
+        return;
+      }
 
-      if (Math.abs(dx) < minSwipe && Math.abs(dy) < minSwipe) return;
+      // Tap: move toward tap position relative to player
+      const rect = mazeCanvas.getBoundingClientRect();
+      const scaleX = mazeCanvas.width / rect.width;
+      const scaleY = mazeCanvas.height / rect.height;
+      const tapX = (e.changedTouches[0].clientX - rect.left) * scaleX;
+      const tapY = (e.changedTouches[0].clientY - rect.top) * scaleY;
+
+      const playerPixelX = playerC * cellSize + cellSize / 2;
+      const playerPixelY = playerR * cellSize + cellSize / 2;
+      const dx = tapX - playerPixelX;
+      const dy = tapY - playerPixelY;
+
+      // Need a minimum distance so tapping right on the player does nothing
+      if (Math.abs(dx) < cellSize * 0.3 && Math.abs(dy) < cellSize * 0.3) return;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        movePlayer(0, dx > 0 ? 1 : -1);
+      } else {
+        movePlayer(dy > 0 ? 1 : -1, 0);
+      }
+    });
+
+    // Mouse click-to-move (for desktop too)
+    mazeCanvas.addEventListener('click', (e) => {
+      const rect = mazeCanvas.getBoundingClientRect();
+      const scaleX = mazeCanvas.width / rect.width;
+      const scaleY = mazeCanvas.height / rect.height;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const clickY = (e.clientY - rect.top) * scaleY;
+
+      const playerPixelX = playerC * cellSize + cellSize / 2;
+      const playerPixelY = playerR * cellSize + cellSize / 2;
+      const dx = clickX - playerPixelX;
+      const dy = clickY - playerPixelY;
+
+      if (Math.abs(dx) < cellSize * 0.3 && Math.abs(dy) < cellSize * 0.3) return;
 
       if (Math.abs(dx) > Math.abs(dy)) {
         movePlayer(0, dx > 0 ? 1 : -1);

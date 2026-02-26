@@ -19,7 +19,7 @@
       <button class="diff-btn" data-size="12">Medium</button>
       <button class="diff-btn" data-size="16">Hard</button>
     </div>
-    <p class="controls-hint">Arrow keys or swipe to move</p>
+    <p class="controls-hint">Tap the maze, use the arrows, or swipe to move</p>
     <button class="btn btn-blue" id="start-btn">Play!</button>
     <p class="best-display" id="menu-best"></p>
   </div>
@@ -36,10 +36,11 @@
 
     <!-- Mobile D-pad controls -->
     <div class="dpad" id="dpad">
-      <button class="dpad-btn dpad-up" data-dir="up">&#9650;</button>
-      <button class="dpad-btn dpad-left" data-dir="left">&#9664;</button>
-      <button class="dpad-btn dpad-right" data-dir="right">&#9654;</button>
-      <button class="dpad-btn dpad-down" data-dir="down">&#9660;</button>
+      <button class="dpad-btn dpad-up" data-dir="up" aria-label="Move up">&#9650;</button>
+      <button class="dpad-btn dpad-left" data-dir="left" aria-label="Move left">&#9664;</button>
+      <button class="dpad-btn dpad-right" data-dir="right" aria-label="Move right">&#9654;</button>
+      <button class="dpad-btn dpad-down" data-dir="down" aria-label="Move down">&#9660;</button>
+      <span class="dpad-hint">or tap maze</span>
     </div>
 
     <div id="win-screen" class="win-screen" style="display:none;">
