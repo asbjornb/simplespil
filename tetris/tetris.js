@@ -118,7 +118,10 @@
 
   function resizeBoard() {
     // Scale the board canvas to fit the viewport while keeping aspect ratio
-    const maxH = window.innerHeight * 0.75;
+    // On touch devices, reserve space for the fixed touch controls at the bottom
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    const controlsHeight = isTouchDevice ? 200 : 0;
+    const maxH = (window.innerHeight - controlsHeight) * 0.75;
     const maxW = window.innerWidth * 0.6;
     const scale = Math.min(maxH / (ROWS * BLOCK), maxW / (COLS * BLOCK), 1);
     boardCanvas.style.width = (COLS * BLOCK * scale) + 'px';

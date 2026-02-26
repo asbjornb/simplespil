@@ -159,6 +159,13 @@ html, body {
   .touch-controls {
     display: block;
   }
+
+  .game-container {
+    padding-bottom: 200px;
+    height: auto;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 }
 
 @media (max-width: 600px) {
