@@ -353,6 +353,106 @@
     ctx.fill();
   }
 
+  function drawBird(ctx, x, y, w, h, frame) {
+    const flapAngle = Math.sin(frame * 0.15) * 0.6;
+    // Body
+    ctx.fillStyle = '#6a4c93';
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.5, y + h * 0.55, w * 0.3, h * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Head
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.78, y + h * 0.4, w * 0.15, h * 0.18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Wings
+    ctx.fillStyle = '#8b6fbf';
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.35, y + h * 0.45);
+    ctx.quadraticCurveTo(x + w * 0.2, y + h * (0.1 - flapAngle * 0.4), x + w * 0.05, y + h * (0.2 - flapAngle * 0.5));
+    ctx.quadraticCurveTo(x + w * 0.25, y + h * (0.35 - flapAngle * 0.2), x + w * 0.45, y + h * 0.5);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.55, y + h * 0.45);
+    ctx.quadraticCurveTo(x + w * 0.45, y + h * (0.15 - flapAngle * 0.3), x + w * 0.35, y + h * (0.25 - flapAngle * 0.4));
+    ctx.quadraticCurveTo(x + w * 0.5, y + h * (0.35 - flapAngle * 0.15), x + w * 0.6, y + h * 0.5);
+    ctx.fill();
+    // Beak
+    ctx.fillStyle = '#f5c518';
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.9, y + h * 0.38);
+    ctx.lineTo(x + w, y + h * 0.42);
+    ctx.lineTo(x + w * 0.9, y + h * 0.46);
+    ctx.closePath();
+    ctx.fill();
+    // Eye
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x + w * 0.82, y + h * 0.37, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.arc(x + w * 0.83, y + h * 0.37, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail feathers
+    ctx.fillStyle = '#8b6fbf';
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.2, y + h * 0.5);
+    ctx.lineTo(x, y + h * 0.35);
+    ctx.lineTo(x + w * 0.05, y + h * 0.55);
+    ctx.lineTo(x + w * 0.15, y + h * 0.6);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawLog(ctx, x, y, w, h) {
+    // Main trunk
+    ctx.fillStyle = '#8B6914';
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.5, y + h * 0.6, w * 0.5, h * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Bark lines
+    ctx.strokeStyle = '#6B4F12';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 3; i++) {
+      const lx = x + w * 0.2 + i * w * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(lx, y + h * 0.3);
+      ctx.lineTo(lx + 3, y + h * 0.8);
+      ctx.stroke();
+    }
+    // End ring
+    ctx.strokeStyle = '#A07B28';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.85, y + h * 0.55, w * 0.12, h * 0.35, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawPlatform(ctx, x, y, w, h) {
+    // Platform body
+    ctx.fillStyle = '#4a4a6a';
+    ctx.fillRect(x, y, w, h);
+    // Top surface
+    ctx.fillStyle = '#5a5a7a';
+    ctx.fillRect(x, y, w, 4);
+    // Grass tufts
+    ctx.fillStyle = '#5a8a4a';
+    for (let i = 0; i < w; i += 12) {
+      ctx.beginPath();
+      ctx.moveTo(x + i, y);
+      ctx.lineTo(x + i + 3, y - 5);
+      ctx.lineTo(x + i + 6, y);
+      ctx.fill();
+    }
+    // Bottom shadow
+    ctx.fillStyle = '#3a3a5a';
+    ctx.fillRect(x, y + h - 3, w, 3);
+    // Side edges
+    ctx.fillStyle = '#3d3d55';
+    ctx.fillRect(x, y, 2, h);
+    ctx.fillRect(x + w - 2, y, 2, h);
+  }
+
   // --- Cloud drawing ---
   function drawCloud(ctx, x, y, size) {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
@@ -378,6 +478,9 @@
   let clouds = [];
   let groundTiles = [];
   let frameCount = 0;
+  let pits = [];
+  let platforms = [];
+  let lastSpawnEdge = 0;
 
   const GRAVITY = 0.6;
   const JUMP_FORCE = -12;
@@ -428,6 +531,46 @@
     drawPreviews();
   });
 
+  function isOverPit(px, pw) {
+    const left = px + pw * 0.3;
+    const right = px + pw * 0.7;
+    for (const pit of pits) {
+      if (right > pit.x && left < pit.x + pit.w) return true;
+    }
+    return false;
+  }
+
+  function isOverPitAt(x) {
+    for (const pit of pits) {
+      if (x > pit.x && x < pit.x + pit.w) return true;
+    }
+    return false;
+  }
+
+  function spawnGroundObstacle(atX) {
+    const types = ['cactus', 'rock', 'log'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    let ow, oh;
+    if (type === 'cactus') {
+      ow = 30 + Math.random() * 20;
+      oh = 40 + Math.random() * 25;
+    } else if (type === 'rock') {
+      ow = 35 + Math.random() * 25;
+      oh = 25 + Math.random() * 15;
+    } else {
+      ow = 40 + Math.random() * 30;
+      oh = 20 + Math.random() * 15;
+    }
+    obstacles.push({
+      x: atX,
+      y: groundY - oh,
+      w: ow,
+      h: oh,
+      type
+    });
+    lastSpawnEdge = Math.max(lastSpawnEdge, atX + ow);
+  }
+
   function updateHighScoreDisplay() {
     highScoreEl.textContent = `Best: ${highScore}`;
     if (highScore > 0) {
@@ -450,6 +593,9 @@
     frameCount = 0;
     obstacles = [];
     clouds = [];
+    pits = [];
+    platforms = [];
+    lastSpawnEdge = 0;
 
     // Init ground tiles
     groundTiles = [];
@@ -552,29 +698,131 @@
     // Player physics
     player.vy += GRAVITY;
     player.y += player.vy;
-    if (player.y >= groundY - PLAYER_H) {
-      player.y = groundY - PLAYER_H;
-      player.vy = 0;
-      player.jumping = false;
-      player.grounded = true;
+
+    // Check platform landing (only when falling)
+    let landed = false;
+    if (player.vy >= 0) {
+      const playerBottom = player.y + player.h;
+      const prevBottom = playerBottom - player.vy;
+      for (const plat of platforms) {
+        if (player.x + player.w - 10 > plat.x && player.x + 10 < plat.x + plat.w) {
+          if (prevBottom <= plat.y + 2 && playerBottom >= plat.y) {
+            player.y = plat.y - player.h;
+            player.vy = 0;
+            player.grounded = true;
+            player.jumping = false;
+            landed = true;
+            break;
+          }
+        }
+      }
     }
 
-    // Spawn obstacles
-    const lastObs = obstacles[obstacles.length - 1];
-    const minGap = MIN_OBSTACLE_GAP - score * 0.3;
-    const gap = Math.max(minGap, 150);
-    if (!lastObs || lastObs.x < canvas.width - gap) {
-      if (Math.random() < 0.02 + score * 0.0002) {
-        const type = Math.random() < 0.5 ? 'cactus' : 'rock';
-        const ow = type === 'cactus' ? 30 + Math.random() * 20 : 35 + Math.random() * 25;
-        const oh = type === 'cactus' ? 40 + Math.random() * 25 : 25 + Math.random() * 15;
-        obstacles.push({
-          x: canvas.width + 20,
-          y: groundY - oh,
-          w: ow,
-          h: oh,
-          type
-        });
+    // Ground collision (only if not over a pit and not on platform)
+    if (!landed && player.y >= groundY - PLAYER_H) {
+      if (!isOverPit(player.x, player.w)) {
+        player.y = groundY - PLAYER_H;
+        player.vy = 0;
+        player.jumping = false;
+        player.grounded = true;
+        landed = true;
+      }
+    }
+
+    // No longer on any surface - start falling
+    if (!landed && player.vy > 0) {
+      player.grounded = false;
+    }
+
+    // Fell off screen (into pit)
+    if (player.y > canvas.height + 50) {
+      endGame();
+      return;
+    }
+
+    // Procedural terrain/obstacle generation
+    lastSpawnEdge -= gameSpeed;
+    const spawnChance = 0.03 + score * 0.0003;
+    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.5, 120);
+
+    if (lastSpawnEdge < canvas.width - minGap) {
+      if (Math.random() < spawnChance) {
+        const difficulty = Math.min(score / 80, 1);
+        const roll = Math.random();
+
+        if (roll < 0.25) {
+          // Single ground obstacle
+          spawnGroundObstacle(canvas.width + 20);
+        } else if (roll < 0.45) {
+          // Cluster of 2-3 ground obstacles
+          const count = Math.random() < 0.4 ? 3 : 2;
+          let cx = canvas.width + 20;
+          for (let i = 0; i < count; i++) {
+            spawnGroundObstacle(cx);
+            cx += 50 + Math.random() * 30;
+          }
+        } else if (roll < 0.6 && difficulty > 0.15) {
+          // Flying bird
+          const birdH = 30 + Math.random() * 10;
+          const birdW = 40 + Math.random() * 15;
+          const flyHeight = groundY - PLAYER_H - 10 - Math.random() * 40;
+          obstacles.push({
+            x: canvas.width + 20,
+            y: flyHeight,
+            w: birdW,
+            h: birdH,
+            type: 'bird'
+          });
+          lastSpawnEdge = canvas.width + 40;
+        } else if (roll < 0.75 && difficulty > 0.25) {
+          // Pit (gap in ground)
+          const pitW = 60 + Math.random() * (40 + difficulty * 40);
+          pits.push({
+            x: canvas.width + 20,
+            w: pitW
+          });
+          lastSpawnEdge = canvas.width + 20 + pitW + 30;
+        } else if (roll < 0.88 && difficulty > 0.35) {
+          // Platform section
+          const platW = 80 + Math.random() * 50;
+          const platY = groundY - 70 - Math.random() * 50;
+          platforms.push({
+            x: canvas.width + 20,
+            y: platY,
+            w: platW,
+            h: 12
+          });
+          // Sometimes add a ground obstacle that forces using the platform
+          if (Math.random() < 0.6) {
+            const obsType = Math.random() < 0.5 ? 'cactus' : 'rock';
+            const ow = 30 + Math.random() * 20;
+            const oh = 50 + Math.random() * 20;
+            obstacles.push({
+              x: canvas.width + 30,
+              y: groundY - oh,
+              w: ow,
+              h: oh,
+              type: obsType
+            });
+          }
+          lastSpawnEdge = canvas.width + 20 + platW;
+        } else if (difficulty > 0.4) {
+          // Pit with platform over it
+          const pitW = 80 + Math.random() * 50;
+          pits.push({ x: canvas.width + 20, w: pitW });
+          const platW = pitW + 20 + Math.random() * 20;
+          const platY = groundY - 60 - Math.random() * 40;
+          platforms.push({
+            x: canvas.width + 10,
+            y: platY,
+            w: platW,
+            h: 12
+          });
+          lastSpawnEdge = canvas.width + 20 + pitW + 30;
+        } else {
+          // Fallback: single ground obstacle
+          spawnGroundObstacle(canvas.width + 20);
+        }
       }
     }
 
@@ -583,6 +831,22 @@
       obstacles[i].x -= gameSpeed;
       if (obstacles[i].x + obstacles[i].w < -20) {
         obstacles.splice(i, 1);
+      }
+    }
+
+    // Move pits
+    for (let i = pits.length - 1; i >= 0; i--) {
+      pits[i].x -= gameSpeed;
+      if (pits[i].x + pits[i].w < -20) {
+        pits.splice(i, 1);
+      }
+    }
+
+    // Move platforms
+    for (let i = platforms.length - 1; i >= 0; i--) {
+      platforms[i].x -= gameSpeed;
+      if (platforms[i].x + platforms[i].w < -20) {
+        platforms.splice(i, 1);
       }
     }
 
@@ -645,29 +909,77 @@
       drawCloud(ctx, cloud.x, cloud.y, cloud.size);
     }
 
-    // Ground
+    // Ground (with pit gaps)
+    const sortedPits = pits.filter(p => p.x < canvas.width && p.x + p.w > 0)
+      .sort((a, b) => a.x - b.x);
+    let gx = 0;
     ctx.fillStyle = '#2d2d44';
-    ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+    for (const pit of sortedPits) {
+      const pitLeft = Math.max(pit.x, 0);
+      const pitRight = Math.min(pit.x + pit.w, canvas.width);
+      if (pitLeft > gx) {
+        ctx.fillRect(gx, groundY, pitLeft - gx, canvas.height - groundY);
+      }
+      // Pit interior (dark void)
+      ctx.fillStyle = '#08081a';
+      ctx.fillRect(pitLeft, groundY, pitRight - pitLeft, canvas.height - groundY);
+      // Pit edge highlights
+      ctx.fillStyle = '#3d3d55';
+      ctx.fillRect(pitLeft, groundY, 3, 15);
+      ctx.fillRect(pitRight - 3, groundY, 3, 15);
+      ctx.fillStyle = '#2d2d44';
+      gx = pitRight;
+    }
+    if (gx < canvas.width) {
+      ctx.fillRect(gx, groundY, canvas.width - gx, canvas.height - groundY);
+    }
+
+    // Ground line (with gaps for pits)
     ctx.strokeStyle = '#3d3d55';
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, groundY);
-    ctx.lineTo(canvas.width, groundY);
-    ctx.stroke();
+    gx = 0;
+    for (const pit of sortedPits) {
+      const pitLeft = Math.max(pit.x, 0);
+      const pitRight = Math.min(pit.x + pit.w, canvas.width);
+      if (pitLeft > gx) {
+        ctx.beginPath();
+        ctx.moveTo(gx, groundY);
+        ctx.lineTo(pitLeft, groundY);
+        ctx.stroke();
+      }
+      gx = pitRight;
+    }
+    if (gx < canvas.width) {
+      ctx.beginPath();
+      ctx.moveTo(gx, groundY);
+      ctx.lineTo(canvas.width, groundY);
+      ctx.stroke();
+    }
 
-    // Ground texture
+    // Ground texture (skip pit areas)
     ctx.fillStyle = '#3d3d55';
     for (const tile of groundTiles) {
-      ctx.fillRect(tile.x, groundY + 8, 12, 2);
-      ctx.fillRect(tile.x + 5, groundY + 18, 8, 2);
+      if (!isOverPitAt(tile.x + 6)) {
+        ctx.fillRect(tile.x, groundY + 8, 12, 2);
+        ctx.fillRect(tile.x + 5, groundY + 18, 8, 2);
+      }
+    }
+
+    // Platforms
+    for (const plat of platforms) {
+      drawPlatform(ctx, plat.x, plat.y, plat.w, plat.h);
     }
 
     // Obstacles
     for (const obs of obstacles) {
       if (obs.type === 'cactus') {
         drawCactus(ctx, obs.x, obs.y, obs.w, obs.h);
-      } else {
+      } else if (obs.type === 'rock') {
         drawRock(ctx, obs.x, obs.y, obs.w, obs.h);
+      } else if (obs.type === 'bird') {
+        drawBird(ctx, obs.x, obs.y, obs.w, obs.h, animFrame);
+      } else if (obs.type === 'log') {
+        drawLog(ctx, obs.x, obs.y, obs.w, obs.h);
       }
     }
 
