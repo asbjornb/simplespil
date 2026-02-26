@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Four in a Row - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="fourinarow.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Four in a Row</h1>
+    <p class="subtitle">Drop pieces to connect four!</p>
+    <div class="mode-select">
+      <button class="btn btn-primary mode-btn" id="btn-2p">2 Players</button>
+      <button class="btn btn-accent mode-btn" id="btn-bot">vs Bot</button>
+    </div>
+  </div>
+
+  <div id="game" class="game-container" style="display:none;">
+    <div class="turn-indicator">
+      <canvas id="turn-disc" width="28" height="28"></canvas>
+      <span id="turn-text">Red's turn</span>
+    </div>
+    <canvas id="board-canvas"></canvas>
+    <div id="game-over" class="game-over" style="display:none;">
+      <h2 id="winner-text">Red wins!</h2>
+      <button class="btn btn-primary" id="restart-btn">Play Again</button>
+      <button class="btn btn-accent" id="menu-btn">Change Mode</button>
+    </div>
+  </div>
+
+  <script src="fourinarow.js"></script>
+</body>
+</html>

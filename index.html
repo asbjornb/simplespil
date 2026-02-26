@@ -40,7 +40,7 @@
       gap: 20px;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 700px;
+      max-width: 900px;
     }
 
     .game-card {
@@ -66,6 +66,7 @@
     .game-card:nth-child(1) { border-color: var(--color-primary); }
     .game-card:nth-child(2) { border-color: var(--color-green); }
     .game-card:nth-child(3) { border-color: var(--color-blue); }
+    .game-card:nth-child(4) { border-color: var(--color-accent); }
 
     .game-icon {
       font-size: 3rem;
@@ -80,6 +81,7 @@
     .game-card:nth-child(1) .game-icon { background: rgba(233, 69, 96, 0.15); }
     .game-card:nth-child(2) .game-icon { background: rgba(78, 204, 163, 0.15); }
     .game-card:nth-child(3) .game-icon { background: rgba(52, 152, 219, 0.15); }
+    .game-card:nth-child(4) .game-icon { background: rgba(245, 197, 24, 0.15); }
 
     .game-card h2 {
       font-size: 1.3rem;
@@ -127,6 +129,14 @@
         </div>
         <h2>Labyrinth</h2>
         <p>Find your way through the maze to reach the star</p>
+      </a>
+
+      <a href="fourinarow/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-four" width="60" height="60"></canvas>
+        </div>
+        <h2>Four in a Row</h2>
+        <p>Drop pieces to connect four in a row, column, or diagonal</p>
       </a>
     </div>
   </div>
@@ -218,6 +228,36 @@
         ctx.fillStyle = '#f5c518';
         ctx.beginPath();
         ctx.arc(48, 48, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Four in a Row icon - mini board with discs
+      const fc = document.getElementById('icon-four');
+      if (fc) {
+        const ctx = fc.getContext('2d');
+        // Board background
+        ctx.fillStyle = '#0f3460';
+        ctx.fillRect(5, 15, 50, 40);
+        // Holes (3x4 grid)
+        const discColors = [
+          [null, null, null, null],
+          [null, null, '#f5c518', null],
+          ['#e94560', '#f5c518', '#e94560', null],
+        ];
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 4; c++) {
+            const cx = 13 + c * 12;
+            const cy = 23 + r * 12;
+            const color = discColors[r][c];
+            ctx.fillStyle = color || '#1a1a2e';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        // Falling piece
+        ctx.fillStyle = '#e94560';
+        ctx.beginPath();
+        ctx.arc(37, 9, 4.5, 0, Math.PI * 2);
         ctx.fill();
       }
     })();
