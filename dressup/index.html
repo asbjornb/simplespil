@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dress Up - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="dressup.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div class="game-wrapper">
+    <h1>Dress Up!</h1>
+
+    <div class="main-area">
+      <canvas id="character" width="300" height="420"></canvas>
+
+      <div class="controls">
+        <div class="category" data-category="skin">
+          <h3>Skin</h3>
+          <div class="options"></div>
+        </div>
+        <div class="category" data-category="hair">
+          <h3>Hair</h3>
+          <div class="options"></div>
+        </div>
+        <div class="category" data-category="hat">
+          <h3>Hat</h3>
+          <div class="options"></div>
+        </div>
+        <div class="category" data-category="top">
+          <h3>Top</h3>
+          <div class="options"></div>
+        </div>
+        <div class="category" data-category="bottom">
+          <h3>Bottom</h3>
+          <div class="options"></div>
+        </div>
+        <div class="category" data-category="shoes">
+          <h3>Shoes</h3>
+          <div class="options"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-random" class="btn btn-accent">Random</button>
+      <button id="btn-share" class="btn btn-blue">Share</button>
+    </div>
+
+    <div id="share-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Share your design!</h2>
+        <p>Copy this link and send it to a friend:</p>
+        <input id="share-url" type="text" readonly>
+        <div class="modal-buttons">
+          <button id="btn-copy" class="btn btn-green">Copy</button>
+          <button id="btn-close-modal" class="btn btn-primary">Close</button>
+        </div>
+        <p id="copy-feedback" class="hidden">Copied!</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="dressup.js"></script>
+</body>
+</html>

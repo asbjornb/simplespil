@@ -67,6 +67,7 @@
     .game-card:nth-child(2) { border-color: var(--color-green); }
     .game-card:nth-child(3) { border-color: var(--color-blue); }
     .game-card:nth-child(4) { border-color: var(--color-accent); }
+    .game-card:nth-child(5) { border-color: var(--color-pink); }
 
     .game-icon {
       font-size: 3rem;
@@ -82,6 +83,7 @@
     .game-card:nth-child(2) .game-icon { background: rgba(78, 204, 163, 0.15); }
     .game-card:nth-child(3) .game-icon { background: rgba(52, 152, 219, 0.15); }
     .game-card:nth-child(4) .game-icon { background: rgba(245, 197, 24, 0.15); }
+    .game-card:nth-child(5) .game-icon { background: rgba(233, 30, 143, 0.15); }
 
     .game-card h2 {
       font-size: 1.3rem;
@@ -137,6 +139,14 @@
         </div>
         <h2>Four in a Row</h2>
         <p>Drop pieces to connect four in a row, column, or diagonal</p>
+      </a>
+
+      <a href="dressup/index.html" class="game-card">
+        <div class="game-icon">
+          <canvas id="icon-dressup" width="60" height="60"></canvas>
+        </div>
+        <h2>Dress Up</h2>
+        <p>Style a character and share your design with friends</p>
       </a>
     </div>
   </div>
@@ -259,6 +269,53 @@
         ctx.beginPath();
         ctx.arc(37, 9, 4.5, 0, Math.PI * 2);
         ctx.fill();
+      }
+      // Dress Up icon - little character with hat
+      const dc = document.getElementById('icon-dressup');
+      if (dc) {
+        const ctx = dc.getContext('2d');
+        // Body
+        ctx.fillStyle = '#e91e8f';
+        ctx.fillRect(22, 28, 16, 18);
+        // Head
+        ctx.fillStyle = '#f5d0a9';
+        ctx.beginPath();
+        ctx.arc(30, 20, 12, 0, Math.PI * 2);
+        ctx.fill();
+        // Eyes
+        ctx.fillStyle = '#2c1810';
+        ctx.beginPath();
+        ctx.arc(26, 18, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(34, 18, 2, 0, Math.PI * 2);
+        ctx.fill();
+        // Smile
+        ctx.strokeStyle = '#2c1810';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(30, 21, 5, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.stroke();
+        // Crown
+        ctx.fillStyle = '#f5c518';
+        ctx.beginPath();
+        ctx.moveTo(20, 12);
+        ctx.lineTo(20, 5);
+        ctx.lineTo(25, 9);
+        ctx.lineTo(30, 3);
+        ctx.lineTo(35, 9);
+        ctx.lineTo(40, 5);
+        ctx.lineTo(40, 12);
+        ctx.closePath();
+        ctx.fill();
+        // Legs
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(23, 46, 6, 10);
+        ctx.fillRect(31, 46, 6, 10);
+        // Shoes
+        ctx.fillStyle = '#e94560';
+        ctx.fillRect(21, 54, 10, 4);
+        ctx.fillRect(29, 54, 10, 4);
       }
     })();
   </script>
