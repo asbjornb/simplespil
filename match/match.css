@@ -1,11 +1,81 @@
 .menu {
-  gap: 16px;
+  justify-content: flex-start;
+  gap: 12px;
   text-align: center;
+  padding-top: 50px;
+  overflow-y: auto;
 }
 
 .subtitle {
   color: var(--color-text-muted);
   font-size: 1.1rem;
+}
+
+.diff-selector {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.diff-btn {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 8px 20px;
+  font-size: 1rem;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.diff-btn:hover {
+  transform: scale(1.05);
+}
+
+.diff-btn.active {
+  border-color: var(--color-accent);
+  background: var(--color-secondary);
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  padding: 4px 0 40px;
+}
+
+.level-card {
+  background: var(--color-surface);
+  border: 3px solid var(--card-color, var(--color-primary));
+  border-radius: var(--radius);
+  padding: 14px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-main);
+  color: var(--color-text);
+}
+
+.level-card:hover,
+.level-card:active {
+  transform: scale(1.05);
+  background: var(--color-secondary);
+}
+
+.level-icon-canvas {
+  width: 60px;
+  height: 60px;
+}
+
+.level-name {
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 #game {
@@ -46,8 +116,24 @@
   background-clip: text;
 }
 
+.win-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 @media (max-width: 600px) {
   #win-screen h1 {
     font-size: 2.2rem;
+  }
+
+  .level-grid {
+    max-width: 320px;
+  }
+
+  .diff-btn {
+    padding: 6px 14px;
+    font-size: 0.9rem;
   }
 }
