@@ -29,6 +29,9 @@ const FILES_TO_CACHE = [
   '/catch/index.html',
   '/catch/catch.css',
   '/catch/catch.js',
+  '/match/index.html',
+  '/match/match.css',
+  '/match/match.js',
   '/manifest.json'
 ];
 
