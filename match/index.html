@@ -12,15 +12,51 @@
 
   <div id="menu" class="menu">
     <h1>Match!</h1>
-    <p class="subtitle">Drag each shape to its matching spot</p>
-    <button class="btn btn-primary" id="start-btn">Play!</button>
+    <p class="subtitle">Pick a level and start matching!</p>
+
+    <div class="diff-selector">
+      <button class="diff-btn" data-diff="easy">Easy</button>
+      <button class="diff-btn active" data-diff="normal">Normal</button>
+      <button class="diff-btn" data-diff="hard">Hard</button>
+    </div>
+
+    <div class="level-grid">
+      <button class="level-card" data-level="0" style="--card-color: #e94560;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Colors</span>
+      </button>
+      <button class="level-card" data-level="1" style="--card-color: #3498db;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Shapes</span>
+      </button>
+      <button class="level-card" data-level="2" style="--card-color: #4ecca3;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Animals</span>
+      </button>
+      <button class="level-card" data-level="3" style="--card-color: #f5c518;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Numbers</span>
+      </button>
+      <button class="level-card" data-level="4" style="--card-color: #9b59b6;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Fruits</span>
+      </button>
+      <button class="level-card" data-level="5" style="--card-color: #f39c12;">
+        <canvas class="level-icon-canvas" width="60" height="60"></canvas>
+        <span class="level-name">Mix It Up!</span>
+      </button>
+    </div>
   </div>
 
   <div id="game" style="display:none;">
     <canvas id="game-canvas"></canvas>
     <div id="win-screen" class="game-over" style="display:none;">
       <h1>Great Job!</h1>
-      <button class="btn btn-primary" id="again-btn">Play Again!</button>
+      <div class="win-buttons">
+        <button class="btn btn-green" id="next-btn">Next Level</button>
+        <button class="btn btn-primary" id="again-btn">Play Again</button>
+        <button class="btn btn-accent" id="levels-btn">Levels</button>
+      </div>
     </div>
   </div>
 

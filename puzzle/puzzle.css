@@ -5,10 +5,7 @@ html, body {
 }
 
 .menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
+  justify-content: flex-start;
   min-height: 100dvh;
   gap: 16px;
   padding: 60px 20px 30px;
@@ -61,23 +58,6 @@ html, body {
   gap: 10px;
 }
 
-.diff-btn {
-  padding: 10px 20px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 3px solid transparent;
-  border-radius: var(--radius);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: var(--font-main);
-  transition: transform 0.15s, border-color 0.15s;
-}
-
-.diff-btn:hover, .diff-btn:active {
-  transform: scale(1.05);
-}
-
 .diff-btn.selected {
   border-color: var(--color-green);
 }
@@ -94,18 +74,11 @@ html, body {
 }
 
 .hud {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  display: flex;
   gap: 10px;
   align-items: center;
   font-size: 0.95rem;
-  font-weight: 600;
-  z-index: 50;
   background: rgba(22, 33, 62, 0.9);
   padding: 6px 12px;
-  border-radius: var(--radius);
 }
 
 .hint-btn {
@@ -219,24 +192,6 @@ html, body {
   border: 2px solid var(--color-accent);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   opacity: 0.9;
-}
-
-.game-over {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--color-surface);
-  padding: 32px;
-  border-radius: var(--radius);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: var(--shadow);
-  z-index: 200;
-  max-width: 90vw;
-  width: 320px;
 }
 
 .game-over h2 {

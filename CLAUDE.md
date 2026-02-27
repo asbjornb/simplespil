@@ -28,6 +28,55 @@ Each game folder contains:
 - `index.html` - Game page (links back to main menu)
 - `<game>.js` - Game logic
 - `<game>.css` - Game-specific styles
+- `icon.js` - Canvas-drawn icon for the main menu
+
+## Adding a New Game
+
+When adding a new game, you must also integrate it into the main menu and stats system:
+
+### 1. Game icon (`<game>/icon.js`)
+Each game needs an `icon.js` that draws a small icon on a canvas element. The pattern:
+```js
+(() => {
+  const canvas = document.getElementById('icon-<game>');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  // Draw icon using Canvas 2D API (simple shapes, ~60x60)
+})();
+```
+- Wrapped in an IIFE, no exports
+- Gets canvas by `id="icon-<game>"` — must match the ID in `index.html`
+- Uses only vanilla Canvas 2D API (arcs, rects, paths, fills)
+- Keep it simple: basic geometric shapes, bright colors
+
+### 2. Stats tracking
+Games use `shared/stats.js` which provides `SimplespilStats.recordPlay('<game>')` and `SimplespilStats.getCount('<game>')` backed by localStorage.
+
+In the game's `index.html`, load stats before the game script:
+```html
+<script src="../shared/stats.js"></script>
+<script src="<game>.js"></script>
+```
+
+In the game's JS, call `SimplespilStats.recordPlay('<game>')` at the start of the `startGame()` function.
+
+### 3. Main menu entry (`index.html`)
+Add a card to the `.game-cards` grid:
+```html
+<a href="<game>/index.html" class="game-card" data-game="<game>" data-color="<color>">
+  <div class="game-icon">
+    <canvas id="icon-<game>" width="60" height="60"></canvas>
+  </div>
+  <h2>Game Name</h2>
+  <p>Short description of the game</p>
+</a>
+```
+And add the icon script at the bottom of `index.html` alongside the others:
+```html
+<script src="<game>/icon.js"></script>
+```
+
+Available `data-color` values: `primary`, `green`, `blue`, `accent`, `pink`, `purple`, `orange`.
 
 ## Code Style
 
