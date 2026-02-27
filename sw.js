@@ -32,6 +32,9 @@ const FILES_TO_CACHE = [
   '/match/index.html',
   '/match/match.css',
   '/match/match.js',
+  '/candy/index.html',
+  '/candy/candy.css',
+  '/candy/candy.js',
   '/manifest.json'
 ];
 

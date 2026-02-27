@@ -1,0 +1,104 @@
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+  text-align: center;
+  padding: 20px;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.size-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+#game {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+#hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 16px;
+  z-index: 100;
+  background: var(--color-surface);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+#score-display {
+  color: var(--color-accent);
+}
+
+#moves-display {
+  color: var(--color-text-muted);
+}
+
+#game-canvas {
+  touch-action: none;
+}
+
+#win-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(26, 26, 46, 0.88);
+  z-index: 10;
+}
+
+#win-screen h1 {
+  font-size: 3rem;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#win-screen p {
+  font-size: 1.3rem;
+  color: var(--color-text-muted);
+}
+
+.win-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  #hud {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    gap: 10px;
+  }
+
+  #win-screen h1 {
+    font-size: 2.2rem;
+  }
+}
