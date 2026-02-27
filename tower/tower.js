@@ -31,6 +31,10 @@
   const FLOOR_SPACING = 55;
   const CAMERA_SMOOTH = 0.08;
   const FALL_DEATH_MARGIN = 250;
+  const MAX_LAUNCH_VX = 7;
+  const RISING_FLOOR_START = 20;
+  const RISING_SPEED_BASE = 0.15;
+  const RISING_SPEED_INCREASE = 0.001;
 
   // Game state
   let gameRunning = false;
@@ -45,11 +49,15 @@
   let particles = [];
   let screenShake = 0;
 
+  // Rising floor state
+  let risingActive = false;
+  let risingSpeed = 0;
+  let cameraMinY = 0;
+
   // Touch state
   let touchId = null;
-  let touchStartX = 0;
   let touchActive = false;
-  let touchDir = 0;
+  let touchLaunchVx = 0;
 
   // Background stars (drawn once, scroll with parallax)
   let stars = [];
@@ -142,6 +150,11 @@
     frameCount = 0;
     particles = [];
     screenShake = 0;
+    risingActive = false;
+    risingSpeed = 0;
+    cameraMinY = 0;
+    touchJump = false;
+    touchLaunchVx = 0;
 
     const hs = SimplespilHighScores.get('tower');
     highScoreDisplay.textContent = 'Best: ' + hs;
@@ -228,12 +241,12 @@
   function update() {
     frameCount++;
 
-    // Horizontal movement
-    if (keys['ArrowLeft'] || keys['a'] || touchDir < 0) {
+    // Horizontal movement (keyboard only — touch uses tap-to-jump)
+    if (keys['ArrowLeft'] || keys['a']) {
       player.vx -= MOVE_ACCEL;
       player.facing = -1;
       player.walkFrame += 0.2;
-    } else if (keys['ArrowRight'] || keys['d'] || touchDir > 0) {
+    } else if (keys['ArrowRight'] || keys['d']) {
       player.vx += MOVE_ACCEL;
       player.facing = 1;
       player.walkFrame += 0.2;
@@ -241,8 +254,10 @@
       player.walkFrame = 0;
     }
     player.vx *= MOVE_FRICTION;
-    if (Math.abs(player.vx) > MOVE_SPEED) {
-      player.vx = MOVE_SPEED * Math.sign(player.vx);
+    // Clamp to MOVE_SPEED for keyboard; touch launches can exceed it
+    const maxVx = Math.max(MOVE_SPEED, MAX_LAUNCH_VX);
+    if (Math.abs(player.vx) > maxVx) {
+      player.vx = maxVx * Math.sign(player.vx);
     }
     player.x += player.vx;
 
@@ -294,17 +309,29 @@
 
     // Jump
     if (player.onGround && (keys['ArrowUp'] || keys['w'] || keys[' '] || touchJump)) {
-      const speed = Math.abs(player.vx);
-      // Super jump if moving fast
-      if (speed > MOVE_SPEED * 0.7) {
-        player.vy = SUPER_JUMP_FORCE;
+      if (touchJump) {
+        // Touch/click: horizontal velocity from tap position
+        player.vx = touchLaunchVx;
+        if (touchLaunchVx !== 0) player.facing = Math.sign(touchLaunchVx);
+        // Super jump when tapping far from center
+        if (Math.abs(touchLaunchVx) > MAX_LAUNCH_VX * 0.5) {
+          player.vy = SUPER_JUMP_FORCE;
+        } else {
+          player.vy = JUMP_FORCE;
+        }
+        touchJump = false;
       } else {
-        player.vy = JUMP_FORCE;
+        // Keyboard: super jump if moving fast
+        const speed = Math.abs(player.vx);
+        if (speed > MOVE_SPEED * 0.7) {
+          player.vy = SUPER_JUMP_FORCE;
+        } else {
+          player.vy = JUMP_FORCE;
+        }
       }
       player.onGround = false;
       player.jumpCount++;
       spawnJumpParticles(player.x, player.y + PLAYER_H);
-      touchJump = false;
     }
 
     // Combo timer
@@ -314,10 +341,26 @@
     // Screen shake decay
     if (screenShake > 0) screenShake *= 0.85;
 
+    // Rising floor mechanic — after a certain level, screen scrolls up
+    if (highestFloor >= RISING_FLOOR_START) {
+      if (!risingActive) {
+        risingActive = true;
+        risingSpeed = RISING_SPEED_BASE;
+        cameraMinY = camera.y;
+      }
+      risingSpeed += RISING_SPEED_INCREASE;
+      cameraMinY -= risingSpeed;
+    }
+
     // Camera follows player (smooth)
     const targetY = player.y - canvas.height * 0.45;
     if (targetY < camera.y) {
       camera.y += (targetY - camera.y) * CAMERA_SMOOTH;
+    }
+
+    // Rising floor forces camera up
+    if (risingActive && camera.y > cameraMinY) {
+      camera.y = cameraMinY;
     }
 
     // Generate more platforms as player climbs
@@ -497,6 +540,17 @@
     }
   }
 
+  function drawRisingWarning() {
+    if (!risingActive) return;
+    const pulse = 0.5 + 0.3 * Math.sin(frameCount * 0.08);
+    const gradHeight = 50;
+    const grad = ctx.createLinearGradient(0, canvas.height - gradHeight, 0, canvas.height);
+    grad.addColorStop(0, 'rgba(233, 69, 96, 0)');
+    grad.addColorStop(1, `rgba(233, 69, 96, ${pulse})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, canvas.height - gradHeight, canvas.width, gradHeight);
+  }
+
   function drawComboText() {
     if (combo <= 2) return;
     const pulse = 1 + Math.sin(frameCount * 0.15) * 0.1;
@@ -540,6 +594,9 @@
     // Combo text overlay
     drawComboText();
 
+    // Rising floor danger warning
+    drawRisingWarning();
+
     ctx.restore();
   }
 
@@ -562,36 +619,29 @@
   });
   window.addEventListener('keyup', e => { keys[e.key] = false; });
 
+  function launchVxFromPosition(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    const relX = clientX - rect.left;
+    const normalizedX = (relX - rect.width / 2) / (rect.width / 2);
+    return Math.max(-1, Math.min(1, normalizedX)) * MAX_LAUNCH_VX;
+  }
+
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     const touch = e.changedTouches[0];
     touchId = touch.identifier;
-    touchStartX = touch.clientX;
     touchActive = true;
-
-    // Tap to jump
+    touchLaunchVx = launchVxFromPosition(touch.clientX);
     touchJump = true;
-
-    // Determine left/right based on touch position
-    if (touch.clientX < canvas.width * 0.35) {
-      touchDir = -1;
-    } else if (touch.clientX > canvas.width * 0.65) {
-      touchDir = 1;
-    } else {
-      touchDir = 0;
-    }
   }, { passive: false });
 
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
-    for (const touch of e.changedTouches) {
-      if (touch.identifier === touchId) {
-        if (touch.clientX < canvas.width * 0.35) {
-          touchDir = -1;
-        } else if (touch.clientX > canvas.width * 0.65) {
-          touchDir = 1;
-        } else {
-          touchDir = 0;
+    // Allow aiming while jump is queued (e.g. tapped while in air)
+    if (touchJump) {
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === touchId) {
+          touchLaunchVx = launchVxFromPosition(touch.clientX);
         }
       }
     }
@@ -601,7 +651,6 @@
     for (const touch of e.changedTouches) {
       if (touch.identifier === touchId) {
         touchActive = false;
-        touchDir = 0;
         touchId = null;
       }
     }
@@ -609,8 +658,13 @@
 
   canvas.addEventListener('touchcancel', () => {
     touchActive = false;
-    touchDir = 0;
     touchId = null;
+  });
+
+  // Mouse click also uses position-based jump (for desktop)
+  canvas.addEventListener('mousedown', e => {
+    touchLaunchVx = launchVxFromPosition(e.clientX);
+    touchJump = true;
   });
 
   // --- Buttons ---
