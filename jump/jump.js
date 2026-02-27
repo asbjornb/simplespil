@@ -691,9 +691,9 @@
       scoreEl.textContent = `Score: ${score}`;
     }
 
-    // Speed up gradually
-    gameSpeed = 4 + score * 0.01;
-    if (gameSpeed > 14) gameSpeed = 14;
+    // Speed up gradually (capped at 9 to stay playable for kids)
+    gameSpeed = 4 + score * 0.005;
+    if (gameSpeed > 9) gameSpeed = 9;
 
     // Player physics
     player.vy += GRAVITY;
@@ -742,12 +742,12 @@
 
     // Procedural terrain/obstacle generation
     lastSpawnEdge -= gameSpeed;
-    const spawnChance = 0.03 + score * 0.0003;
-    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.5, 120);
+    const spawnChance = 0.02 + score * 0.0001;
+    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.3, 200);
 
     if (lastSpawnEdge < canvas.width - minGap) {
       if (Math.random() < spawnChance) {
-        const difficulty = Math.min(score / 80, 1);
+        const difficulty = Math.min(score / 300, 1);
         const roll = Math.random();
 
         if (roll < 0.25) {
@@ -755,17 +755,17 @@
           spawnGroundObstacle(canvas.width + 20);
         } else if (roll < 0.45) {
           // Cluster of 2-3 ground obstacles
-          const count = Math.random() < 0.4 ? 3 : 2;
+          const count = 2;
           let cx = canvas.width + 20;
           for (let i = 0; i < count; i++) {
             spawnGroundObstacle(cx);
-            cx += 50 + Math.random() * 30;
+            cx += 70 + Math.random() * 40;
           }
         } else if (roll < 0.6 && difficulty > 0.15) {
           // Flying bird
-          const birdH = 30 + Math.random() * 10;
+          const birdH = 25 + Math.random() * 10;
           const birdW = 40 + Math.random() * 15;
-          const flyHeight = groundY - PLAYER_H - 10 - Math.random() * 40;
+          const flyHeight = groundY - PLAYER_H - 30 - Math.random() * 30;
           obstacles.push({
             x: canvas.width + 20,
             y: flyHeight,
@@ -776,16 +776,16 @@
           lastSpawnEdge = canvas.width + 40;
         } else if (roll < 0.75 && difficulty > 0.25) {
           // Pit (gap in ground)
-          const pitW = 60 + Math.random() * (40 + difficulty * 40);
+          const pitW = 50 + Math.random() * (20 + difficulty * 20);
           pits.push({
             x: canvas.width + 20,
             w: pitW
           });
-          lastSpawnEdge = canvas.width + 20 + pitW + 30;
+          lastSpawnEdge = canvas.width + 20 + pitW + 60;
         } else if (roll < 0.88 && difficulty > 0.35) {
           // Platform section
-          const platW = 80 + Math.random() * 50;
-          const platY = groundY - 70 - Math.random() * 50;
+          const platW = 90 + Math.random() * 50;
+          const platY = groundY - 65 - Math.random() * 30;
           platforms.push({
             x: canvas.width + 20,
             y: platY,
@@ -793,10 +793,10 @@
             h: 12
           });
           // Sometimes add a ground obstacle that forces using the platform
-          if (Math.random() < 0.6) {
+          if (Math.random() < 0.4) {
             const obsType = Math.random() < 0.5 ? 'cactus' : 'rock';
-            const ow = 30 + Math.random() * 20;
-            const oh = 50 + Math.random() * 20;
+            const ow = 25 + Math.random() * 15;
+            const oh = 35 + Math.random() * 15;
             obstacles.push({
               x: canvas.width + 30,
               y: groundY - oh,
@@ -808,17 +808,17 @@
           lastSpawnEdge = canvas.width + 20 + platW;
         } else if (difficulty > 0.4) {
           // Pit with platform over it
-          const pitW = 80 + Math.random() * 50;
+          const pitW = 60 + Math.random() * 30;
           pits.push({ x: canvas.width + 20, w: pitW });
-          const platW = pitW + 20 + Math.random() * 20;
-          const platY = groundY - 60 - Math.random() * 40;
+          const platW = pitW + 40 + Math.random() * 20;
+          const platY = groundY - 55 - Math.random() * 25;
           platforms.push({
             x: canvas.width + 10,
             y: platY,
             w: platW,
             h: 12
           });
-          lastSpawnEdge = canvas.width + 20 + pitW + 30;
+          lastSpawnEdge = canvas.width + 20 + pitW + 60;
         } else {
           // Fallback: single ground obstacle
           spawnGroundObstacle(canvas.width + 20);
