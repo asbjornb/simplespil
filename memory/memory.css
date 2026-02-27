@@ -1,0 +1,209 @@
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+}
+
+.instructions {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.game-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.game-hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 12px;
+  z-index: 50;
+}
+
+.game-hud span {
+  background: var(--color-surface);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.status-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  min-height: 2em;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+.status-text.watching {
+  color: var(--color-accent);
+}
+
+.status-text.your-turn {
+  color: var(--color-green);
+}
+
+.status-text.wrong {
+  color: var(--color-primary);
+}
+
+.button-ring {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  max-width: 380px;
+  padding: 20px;
+}
+
+.simon-btn {
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.1s, border-color 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.simon-btn::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 12%;
+  width: 76%;
+  height: 30%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.25), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.simon-btn:active {
+  transform: scale(0.95);
+}
+
+.simon-btn.lit {
+  filter: brightness(1.8) saturate(1.3);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: scale(1.08);
+}
+
+.simon-btn.disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.simon-btn.wrong-flash {
+  animation: wrong-shake 0.4s ease-out;
+}
+
+@keyframes wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+/* Button colors */
+.simon-btn[data-color="red"] { background: #d63031; }
+.simon-btn[data-color="blue"] { background: #2980b9; }
+.simon-btn[data-color="green"] { background: #27ae60; }
+.simon-btn[data-color="yellow"] { background: #f1c40f; }
+.simon-btn[data-color="purple"] { background: #8e44ad; }
+.simon-btn[data-color="orange"] { background: #e67e22; }
+
+.game-over {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-surface);
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  z-index: 200;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid var(--color-primary);
+}
+
+.game-over h2 {
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.game-over p {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+@media (max-width: 480px) {
+  .game-hud {
+    top: auto;
+    bottom: 12px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  .button-ring {
+    gap: 12px;
+    max-width: 320px;
+    padding: 12px;
+  }
+
+  .simon-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+  }
+
+  .status-text {
+    font-size: 1.2rem;
+  }
+
+  .game-container {
+    padding-bottom: 60px;
+  }
+}
+
+/* For 5-6 buttons, use slightly smaller sizes */
+.button-ring.buttons-5 .simon-btn,
+.button-ring.buttons-6 .simon-btn {
+  width: 105px;
+  height: 105px;
+}
+
+@media (max-width: 480px) {
+  .button-ring.buttons-5 .simon-btn,
+  .button-ring.buttons-6 .simon-btn {
+    width: 88px;
+    height: 88px;
+  }
+}

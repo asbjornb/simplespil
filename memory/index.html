@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Memory - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="memory.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Memory</h1>
+    <p class="subtitle">Watch the sequence, then repeat it!</p>
+    <p class="instructions">Colored buttons will light up one at a time.<br>Click them back in the same order.</p>
+    <button class="btn btn-green" id="start-btn">Play!</button>
+  </div>
+
+  <div id="game" class="game-container" style="display:none;">
+    <div class="game-hud">
+      <span id="level-display">Round 1</span>
+      <span id="score-display">Score: 0</span>
+    </div>
+
+    <div id="status" class="status-text">Watch carefully...</div>
+
+    <div id="button-ring" class="button-ring">
+      <!-- Buttons are added by JS -->
+    </div>
+
+    <div id="game-over" class="game-over" style="display:none;">
+      <h2>Game Over!</h2>
+      <p id="final-score"></p>
+      <p id="final-level"></p>
+      <button class="btn btn-green" id="retry-btn">Play Again</button>
+      <button class="btn btn-accent" id="menu-btn">Menu</button>
+    </div>
+  </div>
+
+  <script src="../shared/stats.js"></script>
+  <script src="memory.js"></script>
+</body>
+</html>
