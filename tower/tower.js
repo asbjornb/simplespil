@@ -22,7 +22,8 @@
   const SUPER_JUMP_FORCE = -15;
   const MOVE_SPEED = 4.5;
   const MOVE_ACCEL = 0.6;
-  const MOVE_FRICTION = 0.82;
+  const AIR_FRICTION = 0.97;
+  const WALL_BOUNCE = 0.6;
   const PLAYER_W = 28;
   const PLAYER_H = 36;
   const PLATFORM_H = 12;
@@ -241,36 +242,29 @@
   function update() {
     frameCount++;
 
-    // Horizontal movement (keyboard only — touch uses tap-to-jump)
-    let movingHorizontally = false;
+    // Keyboard sets facing direction for next jump (no ground movement)
     if (keys['ArrowLeft'] || keys['a']) {
-      player.vx -= MOVE_ACCEL;
       player.facing = -1;
-      player.walkFrame += 0.2;
-      movingHorizontally = true;
     } else if (keys['ArrowRight'] || keys['d']) {
-      player.vx += MOVE_ACCEL;
       player.facing = 1;
-      player.walkFrame += 0.2;
-      movingHorizontally = true;
-    } else {
-      player.walkFrame = 0;
     }
-    // Apply friction only when not actively moving — otherwise friction
-    // fights acceleration and prevents reaching MOVE_SPEED
-    if (!movingHorizontally) {
-      player.vx *= MOVE_FRICTION;
-    }
-    // Clamp keyboard movement to MOVE_SPEED, touch launches to MAX_LAUNCH_VX
-    const effectiveMax = movingHorizontally ? MOVE_SPEED : MAX_LAUNCH_VX;
-    if (Math.abs(player.vx) > effectiveMax) {
-      player.vx = effectiveMax * Math.sign(player.vx);
+    player.walkFrame = 0;
+
+    // Light air friction so jumps carry wide
+    player.vx *= AIR_FRICTION;
+    if (Math.abs(player.vx) > MAX_LAUNCH_VX) {
+      player.vx = MAX_LAUNCH_VX * Math.sign(player.vx);
     }
     player.x += player.vx;
 
-    // Wrap around screen edges
-    if (player.x + PLAYER_W < 0) player.x = canvas.width;
-    if (player.x > canvas.width) player.x = -PLAYER_W;
+    // Bounce off screen edges (lose some speed but not all)
+    if (player.x < 0) {
+      player.x = 0;
+      player.vx = Math.abs(player.vx) * WALL_BOUNCE;
+    } else if (player.x + PLAYER_W > canvas.width) {
+      player.x = canvas.width - PLAYER_W;
+      player.vx = -Math.abs(player.vx) * WALL_BOUNCE;
+    }
 
     // Vertical physics
     player.vy += GRAVITY;
@@ -328,13 +322,9 @@
         }
         touchJump = false;
       } else {
-        // Keyboard: super jump if moving fast
-        const speed = Math.abs(player.vx);
-        if (speed > MOVE_SPEED * 0.7) {
-          player.vy = SUPER_JUMP_FORCE;
-        } else {
-          player.vy = JUMP_FORCE;
-        }
+        // Keyboard: launch in facing direction
+        player.vx = player.facing * MOVE_SPEED;
+        player.vy = JUMP_FORCE;
       }
       player.onGround = false;
       player.jumpCount++;
