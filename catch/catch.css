@@ -1,12 +1,6 @@
 /* Fruit Catcher styles */
 
 .menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  gap: 20px;
   padding: 32px 20px;
 }
 
@@ -45,14 +39,14 @@
 /* HUD */
 
 .hud {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
+  font-size: inherit;
+  font-weight: normal;
   z-index: 10;
+  background: none;
+  padding: 0;
   pointer-events: none;
 }
 
@@ -80,12 +74,17 @@
 /* Game Over */
 
 .game-over {
-  position: fixed;
-  inset: 0;
-  display: flex;
+  top: 0;
+  left: 0;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  height: 100%;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
+  padding: 0;
+  box-shadow: none;
   z-index: 50;
 }
 
