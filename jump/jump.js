@@ -600,7 +600,7 @@
     pits = [];
     platforms = [];
     lastSpawnEdge = 0;
-    risingFloor = canvas.height + 100;
+    risingFloor = canvas.height;
 
     // Init ground tiles
     groundTiles = [];
@@ -655,7 +655,11 @@
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
-      player.vx = (direction || 0) * 14;
+      // Only override horizontal velocity if a direction was given;
+      // otherwise preserve existing momentum from arrow keys
+      if (direction) {
+        player.vx = direction * 14;
+      }
       player.jumping = true;
       player.grounded = false;
     }
@@ -773,21 +777,21 @@
 
     // Horizontal friction
     if (player.grounded) {
-      player.vx *= 0.85;
+      player.vx *= 0.92;
     } else {
       player.vx *= 0.98;
     }
-    if (Math.abs(player.vx) < 0.3) player.vx = 0;
+    if (Math.abs(player.vx) < 0.05) player.vx = 0;
 
-    // Fell off screen (into pit)
-    if (player.y > canvas.height) {
+    // Fell off screen (into pit) - die shortly after passing ground level
+    if (player.y > groundY + PLAYER_H) {
       endGame();
       return;
     }
 
     // Rising floor
     if (score >= RISING_START_SCORE) {
-      const riseSpeed = 0.3 + (score - RISING_START_SCORE) * 0.002;
+      const riseSpeed = 0.5 + (score - RISING_START_SCORE) * 0.004;
       risingFloor -= riseSpeed;
       if (player.y + player.h > risingFloor) {
         endGame();
