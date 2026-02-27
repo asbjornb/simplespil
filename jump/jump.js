@@ -636,8 +636,8 @@
   }
 
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
   }
 
   window.addEventListener('resize', () => {
@@ -655,7 +655,7 @@
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
-      player.vx = (direction || 0) * 5;
+      player.vx = (direction || 0) * 14;
       player.jumping = true;
       player.grounded = false;
     }
@@ -726,8 +726,8 @@
     // Keyboard horizontal movement
     if (keysDown['ArrowLeft']) player.vx -= 0.8;
     if (keysDown['ArrowRight']) player.vx += 0.8;
-    if (player.vx > 8) player.vx = 8;
-    if (player.vx < -8) player.vx = -8;
+    if (player.vx > 14) player.vx = 14;
+    if (player.vx < -14) player.vx = -14;
 
     // Apply horizontal velocity
     player.x += player.vx;
@@ -780,7 +780,7 @@
     if (Math.abs(player.vx) < 0.3) player.vx = 0;
 
     // Fell off screen (into pit)
-    if (player.y > canvas.height + 50) {
+    if (player.y > canvas.height) {
       endGame();
       return;
     }
