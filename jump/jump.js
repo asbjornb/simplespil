@@ -559,6 +559,7 @@
   let canvas, ctx;
   let gameRunning = false;
   let animFrame = 0;
+  let rafId = null;
   let score = 0;
   let highScore = SimplespilHighScores.get('jump');
   let gameSpeed = 4;
@@ -673,13 +674,17 @@
   }
 
   function startGame() {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
     SimplespilStats.recordPlay('jump');
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
-    resizeCanvas();
     menuEl.style.display = 'none';
     gameEl.style.display = 'flex';
     gameOverEl.style.display = 'none';
+    resizeCanvas();
 
     groundY = canvas.height - 60;
     score = 0;
@@ -722,7 +727,7 @@
     updateHighScoreDisplay();
     gameRunning = true;
     animFrame = 0;
-    requestAnimationFrame(gameLoop);
+    rafId = requestAnimationFrame(gameLoop);
   }
 
   function resizeCanvas() {
@@ -796,10 +801,10 @@
 
   // --- Game loop ---
   function gameLoop() {
-    if (!gameRunning) return;
+    if (!gameRunning) { rafId = null; return; }
     update();
     draw();
-    requestAnimationFrame(gameLoop);
+    rafId = requestAnimationFrame(gameLoop);
   }
 
   function update() {
