@@ -463,18 +463,18 @@
 
   // --- Difficulty scaling ---
   function getSpawnInterval() {
-    // Start at 60 frames, decrease to 25 over time
-    return Math.max(25, 60 - gameTime * 0.003);
+    // Start at 60 frames, decrease to 20 over ~90 seconds
+    return Math.max(20, 60 - gameTime * 0.007);
   }
 
   function getFallSpeed() {
-    // Start at 2.5, increase to 7 over time
-    return Math.min(7, 2.5 + gameTime * 0.002);
+    // Start at 2.5, increase to 10 over ~2 minutes
+    return Math.min(10, 2.5 + gameTime * 0.001);
   }
 
   function getBombChance() {
-    // Start at 10%, increase to 25% over time
-    return Math.min(0.25, 0.10 + gameTime * 0.0001);
+    // Start at 10%, increase to 25% over ~2 minutes
+    return Math.min(0.25, 0.10 + gameTime * 0.00002);
   }
 
   // --- Update ---
@@ -527,7 +527,7 @@
         } else {
           // Caught fruit
           combo++;
-          const comboMult = combo >= 10 ? 3 : combo >= 5 ? 2 : 1;
+          const comboMult = 1 + Math.floor(combo / 5);
           const points = item.fruit.points * comboMult;
           score += points;
           const label = comboMult > 1 ? `+${points} x${comboMult}` : `+${points}`;
@@ -621,12 +621,13 @@
     drawParticles(ctx);
     drawPopups(ctx);
 
-    // Combo indicator
-    if (combo >= 3) {
-      ctx.fillStyle = combo >= 10 ? '#f5c518' : combo >= 5 ? '#f39c12' : '#4ecca3';
+    // Combo indicator - only show when multiplier is active
+    const comboMult = 1 + Math.floor(combo / 5);
+    if (comboMult > 1) {
+      ctx.fillStyle = comboMult >= 4 ? '#f5c518' : comboMult >= 2 ? '#f39c12' : '#4ecca3';
       ctx.font = 'bold 16px ' + getComputedStyle(document.body).fontFamily;
       ctx.textAlign = 'center';
-      ctx.fillText(`Combo x${combo}!`, basket.x, basket.y - 30);
+      ctx.fillText(`x${comboMult} bonus!`, basket.x, basket.y - 30);
     }
   }
 
