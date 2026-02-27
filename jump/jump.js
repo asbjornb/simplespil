@@ -558,8 +558,8 @@
   let selectedChar = 'dino';
   let canvas, ctx;
   let gameRunning = false;
+  let animFrameId = null;
   let animFrame = 0;
-  let rafId = null;
   let score = 0;
   let highScore = SimplespilHighScores.get('jump');
   let gameSpeed = 4;
@@ -674,9 +674,10 @@
   }
 
   function startGame() {
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
+    // Cancel any pending game loop frame to prevent double loops
+    if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
     }
     SimplespilStats.recordPlay('jump');
     canvas = document.getElementById('game-canvas');
@@ -727,7 +728,7 @@
     updateHighScoreDisplay();
     gameRunning = true;
     animFrame = 0;
-    rafId = requestAnimationFrame(gameLoop);
+    animFrameId = requestAnimationFrame(gameLoop);
   }
 
   function resizeCanvas() {
@@ -801,10 +802,17 @@
 
   // --- Game loop ---
   function gameLoop() {
-    if (!gameRunning) { rafId = null; return; }
+    if (!gameRunning) {
+      animFrameId = null;
+      return;
+    }
     update();
+    if (!gameRunning) {
+      animFrameId = null;
+      return;
+    }
     draw();
-    rafId = requestAnimationFrame(gameLoop);
+    animFrameId = requestAnimationFrame(gameLoop);
   }
 
   function update() {
