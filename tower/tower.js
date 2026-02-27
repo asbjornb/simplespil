@@ -284,21 +284,20 @@
           player.vy = 0;
           player.onGround = true;
 
-          // Track floor progression
+          // Track floor progression and combo
+          const floorsJumped = plat.floor - player.currentFloor;
+          if (floorsJumped >= 2) {
+            combo += floorsJumped;
+            comboTimer = 90;
+            spawnComboParticles(player.x, player.y, floorsJumped * 4);
+            screenShake = Math.min(floorsJumped * 2, 8);
+          } else {
+            combo = 0;
+            comboTimer = 0;
+          }
+
           if (plat.floor > player.currentFloor) {
-            const floorsJumped = plat.floor - player.currentFloor;
             player.currentFloor = plat.floor;
-
-            // Combo system
-            if (floorsJumped >= 2) {
-              combo += floorsJumped;
-              comboTimer = 90;
-              spawnComboParticles(player.x, player.y, floorsJumped * 4);
-              screenShake = Math.min(floorsJumped * 2, 8);
-            } else {
-              if (comboTimer <= 0) combo = 0;
-            }
-
             if (plat.floor > highestFloor) {
               highestFloor = plat.floor;
             }
