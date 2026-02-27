@@ -481,6 +481,10 @@
   let pits = [];
   let platforms = [];
   let lastSpawnEdge = 0;
+  let risingFloor;
+  const keysDown = {};
+  const RISING_WARN_SCORE = 80;
+  const RISING_START_SCORE = 120;
 
   const GRAVITY = 0.6;
   const JUMP_FORCE = -12;
@@ -596,6 +600,7 @@
     pits = [];
     platforms = [];
     lastSpawnEdge = 0;
+    risingFloor = canvas.height + 100;
 
     // Init ground tiles
     groundTiles = [];
@@ -619,6 +624,7 @@
       w: PLAYER_W,
       h: PLAYER_H,
       vy: 0,
+      vx: 0,
       jumping: false,
       grounded: true
     };
@@ -645,10 +651,11 @@
   });
 
   // --- Input ---
-  function jump() {
+  function jump(direction) {
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
+      player.vx = (direction || 0) * 5;
       player.jumping = true;
       player.grounded = false;
     }
@@ -657,7 +664,17 @@
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp') {
       e.preventDefault();
-      jump();
+      jump(0);
+    }
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      e.preventDefault();
+      keysDown[e.code] = true;
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      keysDown[e.code] = false;
     }
   });
 
@@ -665,11 +682,18 @@
   if (canvas) {
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      jump();
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const tapX = touch.clientX - rect.left;
+      const direction = (tapX / rect.width - 0.5) * 2;
+      jump(direction);
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      jump();
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const direction = (clickX / rect.width - 0.5) * 2;
+      jump(direction);
     });
   }
 
@@ -698,6 +722,19 @@
     // Player physics
     player.vy += GRAVITY;
     player.y += player.vy;
+
+    // Keyboard horizontal movement
+    if (keysDown['ArrowLeft']) player.vx -= 0.8;
+    if (keysDown['ArrowRight']) player.vx += 0.8;
+    if (player.vx > 8) player.vx = 8;
+    if (player.vx < -8) player.vx = -8;
+
+    // Apply horizontal velocity
+    player.x += player.vx;
+
+    // Keep player in bounds
+    if (player.x < 0) { player.x = 0; player.vx = 0; }
+    if (player.x + player.w > canvas.width) { player.x = canvas.width - player.w; player.vx = 0; }
 
     // Check platform landing (only when falling)
     let landed = false;
@@ -734,10 +771,28 @@
       player.grounded = false;
     }
 
+    // Horizontal friction
+    if (player.grounded) {
+      player.vx *= 0.85;
+    } else {
+      player.vx *= 0.98;
+    }
+    if (Math.abs(player.vx) < 0.3) player.vx = 0;
+
     // Fell off screen (into pit)
     if (player.y > canvas.height + 50) {
       endGame();
       return;
+    }
+
+    // Rising floor
+    if (score >= RISING_START_SCORE) {
+      const riseSpeed = 0.3 + (score - RISING_START_SCORE) * 0.002;
+      risingFloor -= riseSpeed;
+      if (player.y + player.h > risingFloor) {
+        endGame();
+        return;
+      }
     }
 
     // Procedural terrain/obstacle generation
@@ -978,6 +1033,33 @@
       } else if (obs.type === 'log') {
         drawLog(ctx, obs.x, obs.y, obs.w, obs.h);
       }
+    }
+
+    // Rising floor warning glow
+    if (score >= RISING_WARN_SCORE) {
+      const glowIntensity = Math.min((score - RISING_WARN_SCORE) / (RISING_START_SCORE - RISING_WARN_SCORE), 1);
+      const pulseAlpha = 0.15 + Math.sin(frameCount * 0.08) * 0.1;
+      const glowHeight = 30 + glowIntensity * 40;
+      const glowGrad = ctx.createLinearGradient(0, canvas.height - glowHeight, 0, canvas.height);
+      glowGrad.addColorStop(0, 'rgba(255, 0, 0, 0)');
+      glowGrad.addColorStop(1, `rgba(255, 50, 50, ${pulseAlpha * glowIntensity})`);
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(0, canvas.height - glowHeight, canvas.width, glowHeight);
+    }
+
+    // Rising lava floor
+    if (risingFloor < canvas.height) {
+      const lavaGrad = ctx.createLinearGradient(0, risingFloor - 10, 0, risingFloor + 30);
+      lavaGrad.addColorStop(0, 'rgba(255, 100, 50, 0.6)');
+      lavaGrad.addColorStop(0.3, '#e94560');
+      lavaGrad.addColorStop(1, '#8b0000');
+      ctx.fillStyle = lavaGrad;
+      ctx.fillRect(0, risingFloor, canvas.width, canvas.height - risingFloor);
+      const aboveGrad = ctx.createLinearGradient(0, risingFloor - 25, 0, risingFloor);
+      aboveGrad.addColorStop(0, 'rgba(255, 50, 50, 0)');
+      aboveGrad.addColorStop(1, 'rgba(255, 80, 50, 0.4)');
+      ctx.fillStyle = aboveGrad;
+      ctx.fillRect(0, risingFloor - 25, canvas.width, 25);
     }
 
     // Player
