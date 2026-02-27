@@ -108,6 +108,13 @@
 
   function startGame() {
     SimplespilStats.recordPlay('tower');
+
+    // Show game container BEFORE resizing so canvas has layout dimensions
+    gameOverEl.style.display = 'none';
+    menuEl.style.display = 'none';
+    gameEl.style.display = 'flex';
+    newHighEl.style.display = 'none';
+
     resizeCanvas();
     generateStars();
     initPlatforms();
@@ -120,11 +127,6 @@
     frameCount = 0;
     particles = [];
     screenShake = 0;
-
-    gameOverEl.style.display = 'none';
-    menuEl.style.display = 'none';
-    gameEl.style.display = 'flex';
-    newHighEl.style.display = 'none';
 
     const hs = SimplespilHighScores.get('tower');
     highScoreDisplay.textContent = 'Best: ' + hs;
