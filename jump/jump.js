@@ -732,9 +732,9 @@
     // Apply horizontal velocity
     player.x += player.vx;
 
-    // Keep player in bounds
-    if (player.x < 0) { player.x = 0; player.vx = 0; }
-    if (player.x + player.w > canvas.width) { player.x = canvas.width - player.w; player.vx = 0; }
+    // Keep player in bounds (only zero velocity toward the wall, not away)
+    if (player.x < 0) { player.x = 0; if (player.vx < 0) player.vx = 0; }
+    if (player.x + player.w > canvas.width) { player.x = canvas.width - player.w; if (player.vx > 0) player.vx = 0; }
 
     // Check platform landing (only when falling)
     let landed = false;
