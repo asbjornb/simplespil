@@ -54,6 +54,21 @@
   // Background stars (drawn once, scroll with parallax)
   let stars = [];
 
+  // Rounded rectangle helper (ctx.roundRect not supported in all browsers)
+  function drawRoundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
   function resizeCanvas() {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
@@ -381,8 +396,7 @@
 
     // Platform body
     ctx.fillStyle = mainColor;
-    ctx.beginPath();
-    ctx.roundRect(plat.x, sy, plat.w, PLATFORM_H, 4);
+    drawRoundedRect(plat.x, sy, plat.w, PLATFORM_H, 4);
     ctx.fill();
 
     // Top highlight (icy shine)
@@ -429,8 +443,7 @@
 
     // Torso
     ctx.fillStyle = '#e94560';
-    ctx.beginPath();
-    ctx.roundRect(-10, -30 + bodyBounce, 20, 18, 3);
+    drawRoundedRect(-10, -30 + bodyBounce, 20, 18, 3);
     ctx.fill();
 
     // Head
