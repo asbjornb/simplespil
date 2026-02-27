@@ -1,3 +1,4 @@
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+  const swUrl = new URL('../sw.js', document.currentScript.src);
+  navigator.serviceWorker.register(swUrl);
 }
