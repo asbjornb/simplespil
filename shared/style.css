@@ -103,6 +103,70 @@ h1 {
   margin: 16px 0;
 }
 
+/* Menu container — shared by all games */
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* HUD — fixed top-right status bar */
+.hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  z-index: 50;
+  background: rgba(22, 33, 62, 0.8);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+}
+
+/* Difficulty buttons */
+.diff-btn {
+  padding: 10px 20px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 3px solid transparent;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.diff-btn:hover, .diff-btn:active {
+  transform: scale(1.05);
+}
+
+/* Game-over / win-screen — centered modal card */
+.game-over,
+.win-screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-surface);
+  padding: 32px;
+  border-radius: var(--radius);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  z-index: 200;
+  max-width: 90vw;
+  width: 320px;
+}
+
 @media (max-width: 600px) {
   h1 {
     font-size: 1.5rem;

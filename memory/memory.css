@@ -1,9 +1,4 @@
 .menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
   gap: 16px;
   padding: 32px 20px;
   text-align: center;
@@ -31,16 +26,14 @@
   position: relative;
 }
 
-.game-hud {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  display: flex;
+.hud {
   gap: 12px;
-  z-index: 50;
+  font-size: 0.95rem;
+  background: none;
+  padding: 0;
 }
 
-.game-hud span {
+.hud span {
   background: var(--color-surface);
   padding: 6px 14px;
   border-radius: var(--radius);
@@ -137,20 +130,8 @@
 .simon-btn[data-color="orange"] { background: #e67e22; }
 
 .game-over {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--color-surface);
   padding: 40px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  z-index: 200;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
   border: 2px solid var(--color-primary);
 }
 
@@ -165,7 +146,7 @@
 }
 
 @media (max-width: 480px) {
-  .game-hud {
+  .hud {
     top: auto;
     bottom: 12px;
     right: 50%;
