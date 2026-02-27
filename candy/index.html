@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Candy Match - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="candy.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <div id="menu" class="menu">
+    <h1>Candy Match</h1>
+    <p class="subtitle">Swap candies to match 3 or more in a row</p>
+    <div class="size-buttons">
+      <button class="btn btn-primary size-btn" data-size="6">Small (6x6)</button>
+      <button class="btn btn-accent size-btn" data-size="7">Medium (7x7)</button>
+      <button class="btn btn-green size-btn" data-size="8">Large (8x8)</button>
+    </div>
+  </div>
+
+  <div id="game" style="display:none;">
+    <div id="hud">
+      <span id="score-display">Score: 0</span>
+      <span id="moves-display">Moves: 0</span>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <div id="win-screen" style="display:none;">
+      <h1>Well Done!</h1>
+      <p id="final-score"></p>
+      <p id="final-moves"></p>
+      <div class="win-buttons">
+        <button class="btn btn-primary" id="again-btn">Play Again</button>
+        <button class="btn btn-accent" id="menu-btn">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/stats.js"></script>
+  <script src="candy.js"></script>
+</body>
+</html>
