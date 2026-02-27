@@ -780,23 +780,20 @@
 
   canvas = document.getElementById('game-canvas');
   if (canvas) {
+    function tapDirection(clientX, rect) {
+      const rawDir = (clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+      if (Math.abs(rawDir) < 0.08) return 0; // narrow center dead zone = jump straight up
+      return Math.sign(rawDir); // full speed left or right
+    }
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      const tapX = touch.clientX - rect.left;
-      const rawDir = (tapX / rect.width - 0.5) * 2;
-      // Amplify so even a gentle off-center tap gives real horizontal speed
-      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
-      jump(direction);
+      jump(tapDirection(e.touches[0].clientX, rect));
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const rawDir = (clickX / rect.width - 0.5) * 2;
-      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
-      jump(direction);
+      jump(tapDirection(e.clientX, rect));
     });
   }
 
@@ -879,7 +876,8 @@
     }
 
     // Ground collision (only if not over a pit and not on platform)
-    if (!landed && player.y >= groundY - PLAYER_H) {
+    // Don't snap back up if the player has fallen well below ground (into a pit)
+    if (!landed && player.y >= groundY - PLAYER_H && player.y < groundY) {
       if (!isOverPit(player.x, player.w)) {
         player.y = groundY - PLAYER_H;
         player.vy = 0;
@@ -902,8 +900,8 @@
     }
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
 
-    // Fell off screen (into pit) - die shortly after passing ground level
-    if (player.y > groundY + PLAYER_H) {
+    // Fell off screen (into pit) - die shortly after dropping below ground
+    if (player.y > groundY + 20) {
       endGame();
       return;
     }
