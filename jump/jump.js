@@ -655,7 +655,7 @@
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
-      player.vx = (direction || 0) * 14;
+      player.vx = (direction || 0) * 6;
       player.jumping = true;
       player.grounded = false;
     }
@@ -735,6 +735,19 @@
     // Keep player in bounds
     if (player.x < 0) { player.x = 0; player.vx = 0; }
     if (player.x + player.w > canvas.width) { player.x = canvas.width - player.w; player.vx = 0; }
+
+    // Camera: keep player toward the left so upcoming terrain is visible
+    const cameraTargetX = canvas.width * 0.25;
+    if (player.x > cameraTargetX) {
+      const extraScroll = player.x - cameraTargetX;
+      player.x = cameraTargetX;
+      for (const obs of obstacles) obs.x -= extraScroll;
+      for (const pit of pits) pit.x -= extraScroll;
+      for (const plat of platforms) plat.x -= extraScroll;
+      for (const cloud of clouds) cloud.x -= extraScroll;
+      for (const tile of groundTiles) tile.x -= extraScroll;
+      lastSpawnEdge -= extraScroll;
+    }
 
     // Check platform landing (only when falling)
     let landed = false;
