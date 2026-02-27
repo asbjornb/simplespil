@@ -6,6 +6,7 @@
   <title>Whack-a-Mole! - Simplespil</title>
   <link rel="stylesheet" href="../shared/style.css">
   <link rel="stylesheet" href="whacamole.css">
+  <link rel="manifest" href="../manifest.json">
 </head>
 <body>
   <a href="../index.html" class="back-link">&#8592; Back</a>
@@ -40,5 +41,10 @@
 
   <script src="../shared/stats.js"></script>
   <script src="whacamole.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>
