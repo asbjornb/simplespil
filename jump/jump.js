@@ -748,7 +748,7 @@
       // Only override horizontal velocity if a direction was given;
       // otherwise preserve existing momentum from arrow keys
       if (direction) {
-        player.vx = direction * 6;
+        player.vx = direction * 14;
       }
       player.jumping = true;
       player.grounded = false;
