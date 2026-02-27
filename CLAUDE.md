@@ -78,6 +78,16 @@ And add the icon script at the bottom of `index.html` alongside the others:
 
 Available `data-color` values: `primary`, `green`, `blue`, `accent`, `pink`, `purple`, `orange`.
 
+### 4. Service worker cache (`sw.js`)
+All game files must be added to the `FILES_TO_CACHE` array in `sw.js` so they work offline. Add these entries:
+```js
+  '/<game>/index.html',
+  '/<game>/<game>.css',
+  '/<game>/<game>.js',
+  '/<game>/icon.js',
+```
+Also add any new shared scripts (e.g. `/shared/high-scores.js`) if not already listed. After updating the list, bump the `CACHE_NAME` version number so existing installations re-cache.
+
 ## Code Style
 
 - Use vanilla JS (no frameworks or libraries)
