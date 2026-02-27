@@ -690,7 +690,7 @@
     pits = [];
     platforms = [];
     lastSpawnEdge = 0;
-    risingFloor = canvas.height + 100;
+    risingFloor = canvas.height;
 
     // Init ground tiles
     groundTiles = [];
@@ -745,7 +745,11 @@
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
-      player.vx = (direction || 0) * 6;
+      // Only override horizontal velocity if a direction was given;
+      // otherwise preserve existing momentum from arrow keys
+      if (direction) {
+        player.vx = direction * 6;
+      }
       player.jumping = true;
       player.grounded = false;
     }
@@ -775,14 +779,17 @@
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
       const tapX = touch.clientX - rect.left;
-      const direction = (tapX / rect.width - 0.5) * 2;
+      const rawDir = (tapX / rect.width - 0.5) * 2;
+      // Amplify so even a gentle off-center tap gives real horizontal speed
+      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
       jump(direction);
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const direction = (clickX / rect.width - 0.5) * 2;
+      const rawDir = (clickX / rect.width - 0.5) * 2;
+      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
       jump(direction);
     });
   }
@@ -876,14 +883,14 @@
 
     // Horizontal friction
     if (player.grounded) {
-      player.vx *= 0.85;
+      player.vx *= 0.92;
     } else {
       player.vx *= 0.98;
     }
-    if (Math.abs(player.vx) < 0.3) player.vx = 0;
+    if (Math.abs(player.vx) < 0.05) player.vx = 0;
 
-    // Fell off screen (into pit)
-    if (player.y > canvas.height) {
+    // Fell off screen (into pit) - die shortly after passing ground level
+    if (player.y > groundY + PLAYER_H) {
       endGame();
       return;
     }
