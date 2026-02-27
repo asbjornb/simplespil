@@ -754,13 +754,10 @@
           // Single ground obstacle
           spawnGroundObstacle(canvas.width + 20);
         } else if (roll < 0.45) {
-          // Cluster of 2-3 ground obstacles
-          const count = 2;
-          let cx = canvas.width + 20;
-          for (let i = 0; i < count; i++) {
-            spawnGroundObstacle(cx);
-            cx += 70 + Math.random() * 40;
-          }
+          // Cluster of 2 ground obstacles with guaranteed landing gap
+          spawnGroundObstacle(canvas.width + 20);
+          const clearGap = PLAYER_W + 20 + Math.random() * 30;
+          spawnGroundObstacle(lastSpawnEdge + clearGap);
         } else if (roll < 0.6 && difficulty > 0.15) {
           // Flying bird
           const birdH = 25 + Math.random() * 10;
