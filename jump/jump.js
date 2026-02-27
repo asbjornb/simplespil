@@ -689,14 +689,17 @@
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
       const tapX = touch.clientX - rect.left;
-      const direction = (tapX / rect.width - 0.5) * 2;
+      const rawDir = (tapX / rect.width - 0.5) * 2;
+      // Amplify so even a gentle off-center tap gives real horizontal speed
+      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
       jump(direction);
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const direction = (clickX / rect.width - 0.5) * 2;
+      const rawDir = (clickX / rect.width - 0.5) * 2;
+      const direction = Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
       jump(direction);
     });
   }
@@ -791,7 +794,7 @@
 
     // Rising floor
     if (score >= RISING_START_SCORE) {
-      const riseSpeed = 0.5 + (score - RISING_START_SCORE) * 0.004;
+      const riseSpeed = 0.3 + (score - RISING_START_SCORE) * 0.002;
       risingFloor -= riseSpeed;
       if (player.y + player.h > risingFloor) {
         endGame();
