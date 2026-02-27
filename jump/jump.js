@@ -59,68 +59,158 @@
       color: '#e91e8f',
       draw(ctx, x, y, w, h, frame) {
         const bounce = Math.sin(frame * 0.25) * 3;
+        // Tail (drawn behind body)
+        const tailColors = ['#e94560', '#f5c518', '#9b59b6', '#3498db', '#4ecca3'];
+        for (let i = 0; i < 5; i++) {
+          ctx.strokeStyle = tailColors[i];
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(x + w * 0.12, y + h * 0.42);
+          const sway = Math.sin(frame * 0.15 + i * 0.7) * 6;
+          const lift = Math.cos(frame * 0.12 + i * 0.5) * 3;
+          ctx.bezierCurveTo(
+            x - w * 0.05, y + h * (0.25 + i * 0.05) + sway,
+            x - w * 0.08 + lift, y + h * (0.05 + i * 0.06) + sway,
+            x - w * 0.01 + lift, y + h * (-0.02 + i * 0.08)
+          );
+          ctx.stroke();
+        }
+        // Legs (behind body)
+        ctx.fillStyle = '#f0a0cc';
+        const legKick = Math.sin(frame * 0.3) * 3;
+        // Back legs (drawn first, slightly darker)
+        ctx.fillStyle = '#e896be';
+        ctx.fillRect(x + w * 0.28, y + h * 0.68 + legKick, 7, h * 0.28);
+        ctx.fillRect(x + w * 0.55, y + h * 0.68 - legKick, 7, h * 0.28);
+        // Hooves (back)
+        ctx.fillStyle = '#c47aaa';
+        ctx.fillRect(x + w * 0.27, y + h * 0.92 + legKick, 9, 4);
+        ctx.fillRect(x + w * 0.54, y + h * 0.92 - legKick, 9, 4);
+        // Front legs
+        ctx.fillStyle = '#f0a0cc';
+        ctx.fillRect(x + w * 0.36, y + h * 0.68 - legKick, 7, h * 0.28);
+        ctx.fillRect(x + w * 0.62, y + h * 0.68 + legKick, 7, h * 0.28);
+        // Hooves (front)
+        ctx.fillStyle = '#c47aaa';
+        ctx.fillRect(x + w * 0.35, y + h * 0.92 - legKick, 9, 4);
+        ctx.fillRect(x + w * 0.61, y + h * 0.92 + legKick, 9, 4);
         // Body
         ctx.fillStyle = '#f8b4d9';
         ctx.beginPath();
-        ctx.ellipse(x + w * 0.45, y + h * 0.5, w * 0.35, h * 0.28, 0, 0, Math.PI * 2);
+        ctx.ellipse(x + w * 0.45, y + h * 0.52, w * 0.35, h * 0.26, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Body shading (subtle belly highlight)
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.45, y + h * 0.48, w * 0.22, h * 0.14, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        // Neck
+        ctx.fillStyle = '#f8b4d9';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.65, y + h * 0.35);
+        ctx.quadraticCurveTo(x + w * 0.72, y + h * 0.3, x + w * 0.74, y + h * 0.22);
+        ctx.lineTo(x + w * 0.8, y + h * 0.26);
+        ctx.quadraticCurveTo(x + w * 0.76, y + h * 0.42, x + w * 0.68, y + h * 0.48);
         ctx.fill();
         // Head
+        ctx.fillStyle = '#f8b4d9';
         ctx.beginPath();
-        ctx.ellipse(x + w * 0.78, y + h * 0.28, w * 0.18, h * 0.2, 0.3, 0, Math.PI * 2);
+        ctx.ellipse(x + w * 0.8, y + h * 0.25, w * 0.17, h * 0.18, 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        // Snout (lighter area)
+        ctx.fillStyle = '#fcc8e2';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.9, y + h * 0.3, w * 0.07, h * 0.08, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        // Nostril
+        ctx.fillStyle = '#e896be';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.93, y + h * 0.3, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Ear
+        ctx.fillStyle = '#f8b4d9';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.78, y + h * 0.12);
+        ctx.lineTo(x + w * 0.74, y + h * 0.01);
+        ctx.lineTo(x + w * 0.82, y + h * 0.1);
+        ctx.fill();
+        // Inner ear
+        ctx.fillStyle = '#fcc8e2';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.78, y + h * 0.12);
+        ctx.lineTo(x + w * 0.755, y + h * 0.04);
+        ctx.lineTo(x + w * 0.81, y + h * 0.11);
         ctx.fill();
         // Horn
         ctx.fillStyle = '#f5c518';
         ctx.beginPath();
-        ctx.moveTo(x + w * 0.85, y + h * 0.12);
-        ctx.lineTo(x + w * 0.9, y - h * 0.1 + bounce);
-        ctx.lineTo(x + w * 0.8, y + h * 0.12);
+        ctx.moveTo(x + w * 0.86, y + h * 0.1);
+        ctx.lineTo(x + w * 0.88, y - h * 0.12 + bounce);
+        ctx.lineTo(x + w * 0.82, y + h * 0.08);
         ctx.fill();
-        // Horn stripes
+        // Horn spiral stripes
         ctx.strokeStyle = '#e0a800';
         ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x + w * 0.83, y + h * 0.06);
-        ctx.lineTo(x + w * 0.88, y + h * 0.06);
-        ctx.stroke();
-        // Eye
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(x + w * 0.83, y + h * 0.24, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#9b59b6';
-        ctx.beginPath();
-        ctx.arc(x + w * 0.84, y + h * 0.24, 2, 0, Math.PI * 2);
-        ctx.fill();
-        // Mane
-        const maneColors = ['#e94560', '#9b59b6', '#3498db', '#4ecca3', '#f5c518'];
-        for (let i = 0; i < 5; i++) {
-          ctx.fillStyle = maneColors[i];
-          const mx = x + w * 0.65 - i * w * 0.06;
-          const my = y + h * 0.15 + Math.sin(frame * 0.2 + i) * 3;
-          ctx.beginPath();
-          ctx.ellipse(mx, my, 5, 8, -0.3 + i * 0.1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        // Legs
-        ctx.fillStyle = '#f0a0cc';
-        const legKick = Math.sin(frame * 0.3) * 3;
-        ctx.fillRect(x + w * 0.28, y + h * 0.7 + legKick, 7, h * 0.26);
-        ctx.fillRect(x + w * 0.38, y + h * 0.7 - legKick, 7, h * 0.26);
-        ctx.fillRect(x + w * 0.52, y + h * 0.7 + legKick, 7, h * 0.26);
-        ctx.fillRect(x + w * 0.62, y + h * 0.7 - legKick, 7, h * 0.26);
-        // Tail
-        const tailColors = ['#e94560', '#f5c518', '#9b59b6'];
         for (let i = 0; i < 3; i++) {
-          ctx.strokeStyle = tailColors[i];
-          ctx.lineWidth = 3;
+          const t = 0.25 + i * 0.25;
+          const hx = x + w * 0.84 + t * w * 0.02;
+          const hy = y + h * 0.1 - t * h * 0.18 + bounce * t;
           ctx.beginPath();
-          ctx.moveTo(x + w * 0.12, y + h * 0.45);
-          ctx.quadraticCurveTo(
-            x - w * 0.05, y + h * (0.2 + i * 0.08) + Math.sin(frame * 0.2 + i) * 5,
-            x - w * 0.02, y + h * (0.1 + i * 0.1)
-          );
+          ctx.moveTo(hx - 3 + t * 2, hy);
+          ctx.lineTo(hx + 3 - t * 2, hy);
           ctx.stroke();
         }
+        // Eye (larger, more expressive)
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.82, y + h * 0.22, 5, 5.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Iris
+        ctx.fillStyle = '#9b59b6';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.83, y + h * 0.22, 3, 0, Math.PI * 2);
+        ctx.fill();
+        // Pupil
+        ctx.fillStyle = '#2c1654';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.835, y + h * 0.22, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Eye shine
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.82, y + h * 0.205, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        // Eyelashes
+        ctx.strokeStyle = '#2c1654';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.85, y + h * 0.18);
+        ctx.lineTo(x + w * 0.87, y + h * 0.16);
+        ctx.moveTo(x + w * 0.84, y + h * 0.17);
+        ctx.lineTo(x + w * 0.855, y + h * 0.145);
+        ctx.stroke();
+        // Mane (flowing, rainbow strands along neck)
+        const maneColors = ['#e94560', '#f5c518', '#4ecca3', '#3498db', '#9b59b6'];
+        for (let i = 0; i < 5; i++) {
+          ctx.fillStyle = maneColors[i];
+          const wave = Math.sin(frame * 0.18 + i * 0.9) * 4;
+          const mx = x + w * (0.72 - i * 0.05);
+          const my = y + h * (0.08 + i * 0.06);
+          ctx.beginPath();
+          ctx.ellipse(mx + wave * 0.5, my + wave, 4, 10, -0.5 + i * 0.15, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Forelock (hair between ears, over forehead)
+        ctx.fillStyle = '#e94560';
+        ctx.beginPath();
+        const flWave = Math.sin(frame * 0.2) * 2;
+        ctx.ellipse(x + w * 0.82, y + h * 0.08 + flWave, 4, 7, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#f5c518';
+        ctx.beginPath();
+        ctx.ellipse(x + w * 0.79, y + h * 0.1 + flWave * 0.8, 3, 6, 0.2, 0, Math.PI * 2);
+        ctx.fill();
       }
     },
     hamster: {
