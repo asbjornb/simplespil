@@ -31,7 +31,7 @@
   position: relative;
 }
 
-.game-hud {
+.hud {
   position: fixed;
   top: 12px;
   right: 12px;
@@ -40,7 +40,7 @@
   z-index: 50;
 }
 
-.game-hud span {
+.hud span {
   background: var(--color-surface);
   padding: 6px 14px;
   border-radius: var(--radius);
@@ -165,7 +165,7 @@
 }
 
 @media (max-width: 480px) {
-  .game-hud {
+  .hud {
     top: auto;
     bottom: 12px;
     right: 50%;

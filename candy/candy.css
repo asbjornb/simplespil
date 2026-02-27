@@ -31,7 +31,7 @@
   position: relative;
 }
 
-#hud {
+.hud {
   position: fixed;
   top: 12px;
   right: 12px;
@@ -57,7 +57,7 @@
   touch-action: none;
 }
 
-#win-screen {
+.game-over {
   position: fixed;
   top: 0;
   left: 0;
@@ -72,7 +72,7 @@
   z-index: 10;
 }
 
-#win-screen h1 {
+.game-over h1 {
   font-size: 3rem;
   background: linear-gradient(135deg, var(--color-accent), var(--color-pink));
   -webkit-background-clip: text;
@@ -80,7 +80,7 @@
   background-clip: text;
 }
 
-#win-screen p {
+.game-over p {
   font-size: 1.3rem;
   color: var(--color-text-muted);
 }
@@ -92,13 +92,13 @@
 }
 
 @media (max-width: 600px) {
-  #hud {
+  .hud {
     font-size: 0.85rem;
     padding: 6px 12px;
     gap: 10px;
   }
 
-  #win-screen h1 {
+  .game-over h1 {
     font-size: 2.2rem;
   }
 }

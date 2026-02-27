@@ -93,7 +93,7 @@ html, body {
   overflow: hidden;
 }
 
-.puzzle-hud {
+.hud {
   position: fixed;
   top: 12px;
   right: 12px;
@@ -221,7 +221,7 @@ html, body {
   opacity: 0.9;
 }
 
-.win-screen {
+.game-over {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -239,13 +239,13 @@ html, body {
   width: 320px;
 }
 
-.win-screen h2 {
+.game-over h2 {
   color: var(--color-green);
   font-size: 1.8rem;
 }
 
 @media (max-width: 480px) {
-  .puzzle-hud {
+  .hud {
     top: auto;
     bottom: 12px;
     right: 50%;

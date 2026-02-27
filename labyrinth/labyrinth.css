@@ -63,7 +63,7 @@ html, body {
   position: relative;
 }
 
-.maze-hud {
+.hud {
   position: fixed;
   top: 12px;
   right: 12px;
@@ -173,7 +173,7 @@ html, body {
   }
 }
 
-.win-screen {
+.game-over {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -191,7 +191,7 @@ html, body {
   width: 320px;
 }
 
-.win-screen h2 {
+.game-over h2 {
   color: var(--color-blue);
   font-size: 1.8rem;
 }
