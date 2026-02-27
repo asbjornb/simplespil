@@ -486,7 +486,7 @@
   const JUMP_FORCE = -12;
   const PLAYER_W = 60;
   const PLAYER_H = 55;
-  const MIN_OBSTACLE_GAP = 250;
+  const MIN_OBSTACLE_GAP = 400;
 
   // --- DOM refs ---
   const menuEl = document.getElementById('menu');
@@ -743,7 +743,7 @@
     // Procedural terrain/obstacle generation
     lastSpawnEdge -= gameSpeed;
     const spawnChance = 0.02 + score * 0.0001;
-    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.3, 200);
+    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.2, 300);
 
     if (lastSpawnEdge < canvas.width - minGap) {
       if (Math.random() < spawnChance) {
@@ -756,7 +756,7 @@
         } else if (roll < 0.45) {
           // Cluster of 2 ground obstacles with guaranteed landing gap
           spawnGroundObstacle(canvas.width + 20);
-          const clearGap = PLAYER_W + 20 + Math.random() * 30;
+          const clearGap = PLAYER_W + 60 + Math.random() * 40;
           spawnGroundObstacle(lastSpawnEdge + clearGap);
         } else if (roll < 0.6 && difficulty > 0.15) {
           // Flying bird
