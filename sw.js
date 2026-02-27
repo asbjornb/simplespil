@@ -5,6 +5,7 @@ const FILES_TO_CACHE = [
   '/index.html',
   '/shared/style.css',
   '/shared/stats.js',
+  '/shared/sw-register.js',
   '/jump/index.html',
   '/jump/jump.css',
   '/jump/jump.js',
