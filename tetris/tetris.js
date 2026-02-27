@@ -73,7 +73,7 @@
   let score = 0;
   let lines = 0;
   let level = 1;
-  let highScore = parseInt(localStorage.getItem('tetris_highscore')) || 0;
+  let highScore = HighScores.get('tetris');
   let gameRunning = false;
   let dropInterval = null;
   let lockTimer = null;
@@ -145,6 +145,7 @@
   }
 
   function startGame() {
+    SimplespilStats.recordPlay('tetris');
     board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     score = 0;
     lines = 0;
@@ -167,12 +168,8 @@
     gameRunning = false;
     clearInterval(dropInterval);
 
-    let isNew = false;
-    if (score > highScore) {
-      highScore = score;
-      localStorage.setItem('tetris_highscore', highScore);
-      isNew = true;
-    }
+    const isNew = HighScores.check('tetris', score);
+    if (isNew) highScore = score;
 
     finalScoreEl.textContent = 'Score: ' + score;
     newHighEl.style.display = isNew ? '' : 'none';

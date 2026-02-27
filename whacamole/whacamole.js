@@ -4,7 +4,7 @@
   let gameRunning = false;
   let animFrame = null;
   let score = 0;
-  let highScore = parseInt(localStorage.getItem('whacamole_highscore')) || 0;
+  let highScore = HighScores.get('whacamole');
   let timeLeft = 30;
   let selectedTime = 30;
   let timerInterval = null;
@@ -605,12 +605,8 @@
     clearInterval(timerInterval);
     if (animFrame) cancelAnimationFrame(animFrame);
 
-    let isNewHigh = false;
-    if (score > highScore) {
-      highScore = score;
-      localStorage.setItem('whacamole_highscore', highScore);
-      isNewHigh = true;
-    }
+    const isNewHigh = HighScores.check('whacamole', score);
+    if (isNewHigh) highScore = score;
 
     finalScoreEl.textContent = `Score: ${score}`;
     newHighEl.style.display = isNewHigh ? 'block' : 'none';

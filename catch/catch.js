@@ -374,7 +374,7 @@
   let gameRunning = false;
   let animFrame = null;
   let score = 0;
-  let highScore = parseInt(localStorage.getItem('catch_highscore')) || 0;
+  let highScore = HighScores.get('catch');
   let lives = 3;
   let combo = 0;
   let gameTime = 0;
@@ -647,11 +647,8 @@
     if (animFrame) cancelAnimationFrame(animFrame);
     lastTime = 0;
 
-    const isNewBest = score > highScore;
-    if (isNewBest) {
-      highScore = score;
-      localStorage.setItem('catch_highscore', highScore);
-    }
+    const isNewBest = HighScores.check('catch', score);
+    if (isNewBest) highScore = score;
     updateHighScoreDisplay();
 
     SimplespilStats.recordPlay('catch');

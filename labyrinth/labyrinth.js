@@ -66,7 +66,7 @@
   // --- DOM ---
   const menuEl = document.getElementById('menu');
   const gameEl = document.getElementById('game');
-  const winEl = document.getElementById('win-screen');
+  const winEl = document.getElementById('game-over');
   const movesEl = document.getElementById('moves-display');
   const timerEl = document.getElementById('timer-display');
   const levelEl = document.getElementById('level-display');

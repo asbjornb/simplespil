@@ -15,11 +15,11 @@
     <h1>Fruit Catcher</h1>
     <p class="menu-desc">Catch the falling fruits in your basket!</p>
     <button id="play-btn" class="btn btn-green">Play!</button>
-    <p id="high-score" class="high-score-text"></p>
+    <p id="high-score" class="high-score-display"></p>
   </div>
 
   <div id="game-container" class="game-container" style="display:none;">
-    <div class="hud">
+    <div class="catch-hud">
       <div class="hud-lives" id="hud-lives"></div>
       <div class="hud-score">
         <span id="hud-score">0</span>
@@ -42,6 +42,7 @@
   </div>
 
   <script src="../shared/stats.js"></script>
+  <script src="../shared/high-scores.js"></script>
   <script src="catch.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

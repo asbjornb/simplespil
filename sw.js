@@ -1,10 +1,11 @@
-const CACHE_NAME = 'simplespil-v2';
+const CACHE_NAME = 'simplespil-v3';
 
 const FILES_TO_CACHE = [
   '/',
   '/index.html',
   '/shared/style.css',
   '/shared/stats.js',
+  '/shared/high-scores.js',
   '/jump/index.html',
   '/jump/jump.css',
   '/jump/jump.js',
