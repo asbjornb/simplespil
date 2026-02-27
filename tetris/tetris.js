@@ -136,7 +136,7 @@
   function showMenu() {
     gameRunning = false;
     clearInterval(dropInterval);
-    menuEl.style.display = '';
+    menuEl.style.display = 'flex';
     gameEl.style.display = 'none';
     gameOverEl.style.display = 'none';
     if (highScore > 0) {
@@ -152,7 +152,7 @@
     animatingRows = null;
 
     menuEl.style.display = 'none';
-    gameEl.style.display = '';
+    gameEl.style.display = 'flex';
     gameOverEl.style.display = 'none';
     updateHUD();
 
@@ -167,6 +167,8 @@
     gameRunning = false;
     clearInterval(dropInterval);
 
+    SimplespilStats.recordPlay('tetris');
+
     let isNew = false;
     if (score > highScore) {
       highScore = score;
@@ -175,8 +177,8 @@
     }
 
     finalScoreEl.textContent = 'Score: ' + score;
-    newHighEl.style.display = isNew ? '' : 'none';
-    gameOverEl.style.display = '';
+    newHighEl.style.display = isNew ? 'block' : 'none';
+    gameOverEl.style.display = 'flex';
   }
 
   // --- Piece logic ---

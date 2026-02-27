@@ -194,7 +194,7 @@ html, body {
   opacity: 0.9;
 }
 
-.win-screen h2 {
+.game-over h2 {
   color: var(--color-green);
   font-size: 1.8rem;
 }

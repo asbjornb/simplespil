@@ -422,7 +422,7 @@
   function startGame() {
     menuEl.style.display = 'none';
     gameOverEl.style.display = 'none';
-    gameContainerEl.style.display = '';
+    gameContainerEl.style.display = 'block';
 
     resizeCanvas();
 
@@ -657,9 +657,9 @@
     SimplespilStats.recordPlay('catch');
 
     finalScoreEl.textContent = score;
-    newBestEl.style.display = isNewBest ? '' : 'none';
+    newBestEl.style.display = isNewBest ? 'block' : 'none';
     gameContainerEl.style.display = 'none';
-    gameOverEl.style.display = '';
+    gameOverEl.style.display = 'flex';
   }
 
   // --- Show menu ---
@@ -669,7 +669,7 @@
     lastTime = 0;
     gameContainerEl.style.display = 'none';
     gameOverEl.style.display = 'none';
-    menuEl.style.display = '';
+    menuEl.style.display = 'flex';
     updateHighScoreDisplay();
   }
 

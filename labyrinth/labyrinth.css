@@ -141,7 +141,7 @@ html, body {
   }
 }
 
-.win-screen h2 {
+.game-over h2 {
   color: var(--color-blue);
   font-size: 1.8rem;
 }

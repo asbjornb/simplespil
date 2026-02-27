@@ -93,7 +93,7 @@
   touch-action: none;
 }
 
-#win-screen {
+.game-over {
   position: fixed;
   top: 0;
   left: 0;
@@ -108,7 +108,7 @@
   z-index: 10;
 }
 
-#win-screen h1 {
+.game-over h1 {
   font-size: 3rem;
   background: linear-gradient(135deg, var(--color-accent), var(--color-green));
   -webkit-background-clip: text;
@@ -124,7 +124,7 @@
 }
 
 @media (max-width: 600px) {
-  #win-screen h1 {
+  .game-over h1 {
     font-size: 2.2rem;
   }
 
