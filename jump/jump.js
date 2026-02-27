@@ -869,8 +869,6 @@
       const playerBottom = player.y + player.h;
       const prevBottom = playerBottom - player.vy;
       for (const plat of platforms) {
-        // Can't stand on platforms that have mostly scrolled off the left edge
-        if (plat.x + plat.w < PLAYER_W) continue;
         if (player.x + player.w - 10 > plat.x && player.x + 10 < plat.x + plat.w) {
           if (prevBottom <= plat.y + 2 && playerBottom >= plat.y) {
             player.y = plat.y - player.h;
@@ -885,7 +883,8 @@
     }
 
     // Ground collision (only if not over a pit and not on platform)
-    if (!landed && player.y >= groundY - PLAYER_H) {
+    // Don't snap back up if the player has fallen well below ground (into a pit)
+    if (!landed && player.y >= groundY - PLAYER_H && player.y < groundY) {
       if (!isOverPit(player.x, player.w)) {
         player.y = groundY - PLAYER_H;
         player.vy = 0;
@@ -908,8 +907,8 @@
     }
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
 
-    // Fell off screen (into pit) - die shortly after passing ground level
-    if (player.y > groundY + PLAYER_H) {
+    // Fell off screen (into pit) - die shortly after dropping below ground
+    if (player.y > groundY + 20) {
       endGame();
       return;
     }
