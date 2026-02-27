@@ -242,22 +242,29 @@
     frameCount++;
 
     // Horizontal movement (keyboard only — touch uses tap-to-jump)
+    let movingHorizontally = false;
     if (keys['ArrowLeft'] || keys['a']) {
       player.vx -= MOVE_ACCEL;
       player.facing = -1;
       player.walkFrame += 0.2;
+      movingHorizontally = true;
     } else if (keys['ArrowRight'] || keys['d']) {
       player.vx += MOVE_ACCEL;
       player.facing = 1;
       player.walkFrame += 0.2;
+      movingHorizontally = true;
     } else {
       player.walkFrame = 0;
     }
-    player.vx *= MOVE_FRICTION;
-    // Clamp to MOVE_SPEED for keyboard; touch launches can exceed it
-    const maxVx = Math.max(MOVE_SPEED, MAX_LAUNCH_VX);
-    if (Math.abs(player.vx) > maxVx) {
-      player.vx = maxVx * Math.sign(player.vx);
+    // Apply friction only when not actively moving — otherwise friction
+    // fights acceleration and prevents reaching MOVE_SPEED
+    if (!movingHorizontally) {
+      player.vx *= MOVE_FRICTION;
+    }
+    // Clamp keyboard movement to MOVE_SPEED, touch launches to MAX_LAUNCH_VX
+    const effectiveMax = movingHorizontally ? MOVE_SPEED : MAX_LAUNCH_VX;
+    if (Math.abs(player.vx) > effectiveMax) {
+      player.vx = effectiveMax * Math.sign(player.vx);
     }
     player.x += player.vx;
 
