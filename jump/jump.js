@@ -573,7 +573,6 @@
   let lastSpawnEdge = 0;
   let risingFloor;
   const keysDown = {};
-  let activeTouch = null;
   const RISING_WARN_SCORE = 80;
   const RISING_START_SCORE = 120;
 
@@ -692,7 +691,6 @@
     platforms = [];
     lastSpawnEdge = 0;
     risingFloor = canvas.height;
-    activeTouch = null;
 
     // Init ground tiles
     groundTiles = [];
@@ -776,37 +774,20 @@
 
   canvas = document.getElementById('game-canvas');
   if (canvas) {
-    function touchDirection(clientX, rect) {
-      const tapX = clientX - rect.left;
-      const rawDir = (tapX / rect.width - 0.5) * 2;
-      return Math.abs(rawDir) < 0.1 ? 0 : Math.sign(rawDir) * Math.max(Math.abs(rawDir), 0.5);
+    function tapDirection(clientX, rect) {
+      const rawDir = (clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+      if (Math.abs(rawDir) < 0.08) return 0; // narrow center dead zone = jump straight up
+      return Math.sign(rawDir); // full speed left or right
     }
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      const direction = touchDirection(touch.clientX, rect);
-      activeTouch = { direction };
-      jump(direction);
-    });
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
-      activeTouch = { direction: touchDirection(touch.clientX, rect) };
-    });
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      if (e.touches.length === 0) activeTouch = null;
-    });
-    canvas.addEventListener('touchcancel', () => {
-      activeTouch = null;
+      jump(tapDirection(e.touches[0].clientX, rect));
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const direction = touchDirection(e.clientX, rect);
-      jump(direction);
+      jump(tapDirection(e.clientX, rect));
     });
   }
 
@@ -836,10 +817,9 @@
     player.vy += GRAVITY;
     player.y += player.vy;
 
-    // Horizontal movement (keyboard or continuous touch hold)
+    // Keyboard horizontal movement
     if (keysDown['ArrowLeft']) player.vx -= 0.8;
     if (keysDown['ArrowRight']) player.vx += 0.8;
-    if (activeTouch && activeTouch.direction) player.vx += activeTouch.direction * 0.8;
     if (player.vx > 14) player.vx = 14;
     if (player.vx < -14) player.vx = -14;
 
@@ -1196,7 +1176,6 @@
 
   function endGame() {
     gameRunning = false;
-    activeTouch = null;
     const result = SimplespilHighScores.save('jump', score);
     highScore = result.highScore;
     finalScoreEl.textContent = `Score: ${score}`;
