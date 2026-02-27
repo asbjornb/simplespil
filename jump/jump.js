@@ -470,7 +470,7 @@
   let gameRunning = false;
   let animFrame = 0;
   let score = 0;
-  let highScore = parseInt(localStorage.getItem('jump_highscore') || '0', 10);
+  let highScore = SimplespilHighScores.get('jump');
   let gameSpeed = 4;
   let groundY;
   let player = {};
@@ -989,14 +989,10 @@
 
   function endGame() {
     gameRunning = false;
-    let isNew = false;
-    if (score > highScore) {
-      highScore = score;
-      localStorage.setItem('jump_highscore', String(highScore));
-      isNew = true;
-    }
+    const result = SimplespilHighScores.save('jump', score);
+    highScore = result.highScore;
     finalScoreEl.textContent = `Score: ${score}`;
-    newHighEl.style.display = isNew ? 'block' : 'none';
+    newHighEl.style.display = result.isNew ? 'block' : 'none';
     updateHighScoreDisplay();
     gameOverEl.style.display = 'flex';
   }
