@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Fruit Catcher - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="catch.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&larr; Menu</a>
+
+  <div id="menu" class="menu">
+    <h1>Fruit Catcher</h1>
+    <p class="menu-desc">Catch the falling fruits in your basket!</p>
+    <button id="play-btn" class="btn btn-green">Play!</button>
+    <p id="high-score" class="high-score-text"></p>
+  </div>
+
+  <div id="game-container" class="game-container" style="display:none;">
+    <div class="hud">
+      <div class="hud-lives" id="hud-lives"></div>
+      <div class="hud-score">
+        <span id="hud-score">0</span>
+        <span class="hud-best" id="hud-best"></span>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <div id="game-over" class="game-over" style="display:none;">
+    <div class="game-over-box">
+      <h2>Game Over!</h2>
+      <p class="final-score">Score: <span id="final-score">0</span></p>
+      <p id="new-best" class="new-best" style="display:none;">New High Score!</p>
+      <div class="game-over-buttons">
+        <button id="restart-btn" class="btn btn-green">Play Again</button>
+        <button id="menu-btn" class="btn btn-primary">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/stats.js"></script>
+  <script src="catch.js"></script>
+</body>
+</html>
