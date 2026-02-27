@@ -13,6 +13,40 @@
   <div id="menu" class="menu">
     <h1>Match!</h1>
     <p class="subtitle">Drag each shape to its matching spot</p>
+
+    <div id="level-select" class="level-select">
+      <div class="level-card selected" data-level="colors">
+        <canvas class="level-icon" id="icon-colors" width="60" height="60"></canvas>
+        <span>Colors</span>
+      </div>
+      <div class="level-card" data-level="shapes">
+        <canvas class="level-icon" id="icon-shapes" width="60" height="60"></canvas>
+        <span>Shapes</span>
+      </div>
+      <div class="level-card" data-level="animals">
+        <canvas class="level-icon" id="icon-animals" width="60" height="60"></canvas>
+        <span>Animals</span>
+      </div>
+      <div class="level-card" data-level="numbers">
+        <canvas class="level-icon" id="icon-numbers" width="60" height="60"></canvas>
+        <span>Numbers</span>
+      </div>
+      <div class="level-card" data-level="sizes">
+        <canvas class="level-icon" id="icon-sizes" width="60" height="60"></canvas>
+        <span>Sizes</span>
+      </div>
+      <div class="level-card" data-level="fruits">
+        <canvas class="level-icon" id="icon-fruits" width="60" height="60"></canvas>
+        <span>Fruits</span>
+      </div>
+    </div>
+
+    <div class="difficulty-select">
+      <button class="diff-btn selected" data-diff="easy">Easy</button>
+      <button class="diff-btn" data-diff="normal">Normal</button>
+      <button class="diff-btn" data-diff="hard">Hard</button>
+    </div>
+
     <button class="btn btn-primary" id="start-btn">Play!</button>
   </div>
 
@@ -20,7 +54,11 @@
     <canvas id="game-canvas"></canvas>
     <div id="win-screen" style="display:none;">
       <h1>Great Job!</h1>
-      <button class="btn btn-primary" id="again-btn">Play Again!</button>
+      <div id="win-buttons">
+        <button class="btn btn-green" id="next-btn">Next Level!</button>
+        <button class="btn btn-accent" id="again-btn">Play Again</button>
+        <button class="btn btn-blue" id="menu-btn">Menu</button>
+      </div>
     </div>
   </div>
 
