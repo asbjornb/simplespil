@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Candy Crush - Simplespil</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="candycrush.css">
+</head>
+<body>
+  <a href="../index.html" class="back-link">&#8592; Back</a>
+
+  <!-- MENU SCREEN -->
+  <div id="menu" class="menu">
+    <h1>Candy Crush</h1>
+    <p class="subtitle">Match 3 or more candies to score points!</p>
+    <div class="difficulty-select">
+      <p class="select-label">Board Size</p>
+      <div class="diff-buttons">
+        <button class="btn btn-green diff-btn selected" data-size="7">Small</button>
+        <button class="btn btn-blue diff-btn" data-size="8">Medium</button>
+        <button class="btn btn-purple diff-btn" data-size="9">Large</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="start-btn">Play!</button>
+    <p class="high-score-display" id="menu-high-score"></p>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game" class="game-container" style="display:none;">
+    <div class="hud">
+      <span id="moves-display">Moves: 30</span>
+      <span id="score-display">Score: 0</span>
+      <span id="high-score-display">Best: 0</span>
+    </div>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over" class="game-over" style="display:none;">
+      <h2>Game Over!</h2>
+      <p id="final-score"></p>
+      <p id="new-high" style="display:none;">New High Score!</p>
+      <button class="btn btn-primary" id="restart-btn">Play Again</button>
+      <button class="btn btn-accent" id="menu-btn">Menu</button>
+    </div>
+  </div>
+
+  <script src="../shared/stats.js"></script>
+  <script src="candycrush.js"></script>
+</body>
+</html>

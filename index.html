@@ -180,6 +180,14 @@
         <h2>Whack-a-Mole</h2>
         <p>Tap the moles before they hide back in their holes</p>
       </a>
+
+      <a href="candycrush/index.html" class="game-card" data-game="candycrush" data-color="pink">
+        <div class="game-icon">
+          <canvas id="icon-candycrush" width="60" height="60"></canvas>
+        </div>
+        <h2>Candy Crush</h2>
+        <p>Swap and match colorful candies in a row</p>
+      </a>
     </div>
   </div>
 
@@ -482,6 +490,41 @@
         };
         drawStar(48, 12, 7);
         drawStar(10, 10, 5);
+      }
+      // Candy Crush icon - colorful candy grid
+      const cc = document.getElementById('icon-candycrush');
+      if (cc) {
+        const ctx = cc.getContext('2d');
+        const colors = ['#e94560', '#4ecca3', '#3498db', '#f5c518', '#9b59b6', '#f39c12'];
+        const grid = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [0, 2, 1],
+        ];
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 3; c++) {
+            const cx = 12 + c * 18;
+            const cy = 12 + r * 18;
+            ctx.fillStyle = colors[grid[r][c]];
+            ctx.beginPath();
+            ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.arc(cx - 2, cy - 2, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        // Swap arrows
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(38, 30);
+        ctx.lineTo(52, 30);
+        ctx.lineTo(48, 26);
+        ctx.moveTo(52, 30);
+        ctx.lineTo(48, 34);
+        ctx.stroke();
       }
     })();
   </script>

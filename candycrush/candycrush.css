@@ -1,0 +1,133 @@
+html, body {
+  overflow-y: auto;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+  padding: 20px;
+}
+
+.menu h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.difficulty-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-label {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.diff-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.diff-btn {
+  padding: 8px 18px;
+  font-size: 0.95rem;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.diff-btn.selected {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.high-score-display {
+  color: var(--color-accent);
+  font-weight: 600;
+  min-height: 1.5em;
+}
+
+.game-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  z-index: 50;
+  background: rgba(22, 33, 62, 0.8);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+}
+
+#game-canvas {
+  touch-action: none;
+}
+
+.game-over {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-surface);
+  padding: 32px;
+  border-radius: var(--radius);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  z-index: 200;
+  max-width: 90vw;
+  width: 320px;
+}
+
+.game-over h2 {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+}
+
+#new-high {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .hud {
+    font-size: 0.85rem;
+    gap: 10px;
+    padding: 5px 10px;
+    right: 8px;
+    top: 8px;
+  }
+
+  .menu h1 {
+    font-size: 2rem;
+  }
+}
