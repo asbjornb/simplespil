@@ -574,6 +574,7 @@
   let lastSpawnEdge = 0;
   let risingFloor;
   const keysDown = {};
+  let touchDir = 0; // track active touch direction for continuous acceleration
   const RISING_WARN_SCORE = 80;
   const RISING_START_SCORE = 120;
 
@@ -788,7 +789,13 @@
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      jump(tapDirection(e.touches[0].clientX, rect));
+      const dir = tapDirection(e.touches[0].clientX, rect);
+      touchDir = dir;
+      jump(dir);
+    });
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      touchDir = 0;
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -830,9 +837,10 @@
     player.vy += GRAVITY;
     player.y += player.vy;
 
-    // Keyboard horizontal movement
+    // Horizontal movement (keyboard + touch)
     if (keysDown['ArrowLeft']) player.vx -= 0.8;
     if (keysDown['ArrowRight']) player.vx += 0.8;
+    if (touchDir) player.vx += touchDir * 0.8;
     if (player.vx > 14) player.vx = 14;
     if (player.vx < -14) player.vx = -14;
 
@@ -891,6 +899,9 @@
     if (!landed && player.vy > 0) {
       player.grounded = false;
     }
+
+    // Clear touch direction once landed so player doesn't slide
+    if (player.grounded) touchDir = 0;
 
     // Horizontal friction
     if (player.grounded) {
