@@ -8,13 +8,54 @@
   font-size: 1.1rem;
 }
 
-.size-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.tip {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  opacity: 0.7;
+  max-width: 320px;
+}
+
+/* Level select grid */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 56px);
+  gap: 10px;
+  justify-content: center;
   margin-top: 8px;
 }
 
+.level-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.level-btn.unlocked {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: rgba(255,255,255,0.15);
+}
+
+.level-btn.unlocked:hover,
+.level-btn.unlocked:active {
+  transform: scale(1.1);
+  box-shadow: var(--shadow);
+}
+
+.level-btn.locked {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Game area */
 #game {
   width: 100%;
   height: 100vh;
@@ -25,67 +66,155 @@
   position: relative;
 }
 
+/* HUD */
 .hud {
   z-index: 100;
   background: var(--color-surface);
   padding: 8px 16px;
   font-size: 1rem;
+  align-items: center;
+}
+
+#level-display {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.hud-progress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
 }
 
 #score-display {
   color: var(--color-accent);
+  font-weight: 700;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+.hud-sep {
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+}
+
+#target-display {
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+  min-width: 2.5em;
+}
+
+.progress-bar {
+  width: 80px;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-green));
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.moves-box {
+  color: var(--color-text-muted);
 }
 
 #moves-display {
-  color: var(--color-text-muted);
+  color: #fff;
+  font-weight: 700;
 }
 
 #game-canvas {
   touch-action: none;
 }
 
-.game-over {
+/* Overlay screens (win / fail) */
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  background: rgba(26, 26, 46, 0.88);
-  z-index: 10;
+  background: rgba(26, 26, 46, 0.85);
+  z-index: 200;
 }
 
-.game-over h1 {
-  font-size: 3rem;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-pink));
+.overlay-card {
+  background: var(--color-surface);
+  padding: 32px;
+  border-radius: var(--radius);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  max-width: 90vw;
+  width: 340px;
+}
+
+.overlay-card h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-green));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.game-over p {
+.overlay-card p {
   font-size: 1.3rem;
   color: var(--color-text-muted);
 }
 
 .win-buttons {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.win-buttons .btn {
+  padding: 12px 20px;
+  font-size: 1rem;
 }
 
 @media (max-width: 600px) {
   .hud {
-    font-size: 0.85rem;
-    padding: 6px 12px;
-    gap: 10px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    gap: 8px;
   }
 
-  .game-over h1 {
-    font-size: 2.2rem;
+  .progress-bar {
+    width: 50px;
+  }
+
+  .overlay-card h1 {
+    font-size: 1.8rem;
+  }
+
+  .overlay-card {
+    padding: 24px;
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(4, 48px);
+    gap: 8px;
+  }
+
+  .level-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
   }
 }
