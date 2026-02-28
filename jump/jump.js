@@ -754,7 +754,7 @@
       // Only override horizontal velocity if a direction was given;
       // otherwise preserve existing momentum from arrow keys
       if (direction) {
-        player.vx = direction * 14;
+        player.vx = direction * 30;
       }
       player.jumping = true;
       player.grounded = false;
@@ -830,11 +830,11 @@
     player.vy += GRAVITY;
     player.y += player.vy;
 
-    // Keyboard horizontal movement
+    // Horizontal movement (keyboard + touch)
     if (keysDown['ArrowLeft']) player.vx -= 0.8;
     if (keysDown['ArrowRight']) player.vx += 0.8;
-    if (player.vx > 14) player.vx = 14;
-    if (player.vx < -14) player.vx = -14;
+    if (player.vx > 30) player.vx = 30;
+    if (player.vx < -30) player.vx = -30;
 
     // Apply horizontal velocity
     player.x += player.vx;
