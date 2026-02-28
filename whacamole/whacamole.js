@@ -9,13 +9,6 @@
 
   const MOLE_POINTS = { normal: 1, golden: 3, speed: 2, bomb: -2 };
 
-  // --- Difficulty presets ---
-  const DIFFICULTIES = {
-    easy:   { totalWaves: 8,  baseMoles: 4, molesGrowth: 1, baseInterval: 1300, minInterval: 500, baseUp: 75, minUp: 35 },
-    normal: { totalWaves: 10, baseMoles: 5, molesGrowth: 1, baseInterval: 1200, minInterval: 400, baseUp: 70, minUp: 30 },
-    hard:   { totalWaves: 12, baseMoles: 5, molesGrowth: 2, baseInterval: 1100, minInterval: 350, baseUp: 60, minUp: 25 },
-  };
-
   // --- Game state ---
   let canvas, ctx;
   let gameRunning = false;
@@ -24,7 +17,6 @@
   let highScore = SimplespilHighScores.get('whacamole');
   let frame = 0;
   let lastMoleSpawn = 0;
-  let difficulty = 'normal';
 
   // Wave state
   let wave = 0;
@@ -63,16 +55,7 @@
   const startBtn = document.getElementById('start-btn');
   const restartBtn = document.getElementById('restart-btn');
   const menuBtn = document.getElementById('menu-btn');
-
-  // --- Difficulty selection ---
-  const diffBtns = document.querySelectorAll('.diff-btn');
-  diffBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      diffBtns.forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      difficulty = btn.dataset.difficulty;
-    });
-  });
+  const stopBtn = document.getElementById('stop-btn');
 
   // --- Show high score on menu ---
   function updateMenuHighScore() {
@@ -80,14 +63,12 @@
   }
   updateMenuHighScore();
 
-  // --- Wave parameters ---
+  // --- Wave parameters (endless, scaling difficulty) ---
   function getWaveParams(waveNum) {
-    const d = DIFFICULTIES[difficulty];
-    const progress = (waveNum - 1) / Math.max(1, d.totalWaves - 1);
     return {
-      moleCount: d.baseMoles + (waveNum - 1) * d.molesGrowth,
-      spawnInterval: Math.max(d.minInterval, d.baseInterval - progress * (d.baseInterval - d.minInterval)),
-      upDuration: Math.max(d.minUp, d.baseUp - progress * (d.baseUp - d.minUp)),
+      moleCount: 5 + (waveNum - 1),
+      spawnInterval: Math.max(400, 1200 - (waveNum - 1) * 80),
+      upDuration: Math.max(25, 70 - (waveNum - 1) * 4),
       goldenChance: waveNum >= 2 ? Math.min(0.18, (waveNum - 1) * 0.03) : 0,
       speedChance:  waveNum >= 3 ? Math.min(0.20, (waveNum - 2) * 0.04) : 0,
       bombChance:   waveNum >= 4 ? Math.min(0.15, (waveNum - 3) * 0.03) : 0,
@@ -738,17 +719,12 @@
     trySpawnMole(now);
     updateMoles();
 
-    // Check wave completion
+    // Check wave completion — endless, always advance
     if (waveParams && molesSpawned >= waveParams.moleCount && molesResolved >= waveParams.moleCount) {
-      const d = DIFFICULTIES[difficulty];
-      if (wave >= d.totalWaves) {
-        endGame();
-        return;
-      }
       wave++;
       waveTransition = true;
       waveTransitionTimer = WAVE_TRANSITION_FRAMES;
-      waveDisplay.textContent = `Wave ${wave}/${d.totalWaves}`;
+      waveDisplay.textContent = `Wave ${wave}`;
     }
 
     draw();
@@ -766,12 +742,10 @@
     hammerHitting = false;
     hammerTimer = 0;
     waveTransition = false;
-
-    const d = DIFFICULTIES[difficulty];
     wave = 1;
 
     scoreDisplay.textContent = 'Score: 0';
-    waveDisplay.textContent = `Wave 1/${d.totalWaves}`;
+    waveDisplay.textContent = 'Wave 1';
     highScoreDisplay.textContent = `Best: ${highScore}`;
     gameOverEl.style.display = 'none';
 
@@ -794,10 +768,9 @@
     const result = SimplespilHighScores.save('whacamole', score);
     highScore = result.highScore;
 
-    const d = DIFFICULTIES[difficulty];
-    gameOverTitle.textContent = wave >= d.totalWaves ? 'All Waves Complete!' : 'Game Over!';
+    gameOverTitle.textContent = 'Game Over!';
     finalScoreEl.textContent = `Score: ${score}`;
-    finalWaveEl.textContent = `Waves: ${wave}/${d.totalWaves}`;
+    finalWaveEl.textContent = `Reached Wave ${wave}`;
     newHighEl.style.display = result.isNew ? 'block' : 'none';
     gameOverEl.style.display = 'flex';
   }
@@ -819,6 +792,10 @@
   restartBtn.addEventListener('click', () => {
     gameOverEl.style.display = 'none';
     startGame();
+  });
+
+  stopBtn.addEventListener('click', () => {
+    if (gameRunning) endGame();
   });
 
   menuBtn.addEventListener('click', () => {
