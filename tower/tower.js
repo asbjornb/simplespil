@@ -358,9 +358,9 @@
         cameraMinY = camera.y;
       }
       risingSpeed = Math.min(risingSpeed + RISING_SPEED_INCREASE, RISING_SPEED_MAX);
-      // Keep rising floor tracking the player — don't let it fall more than
-      // one screen behind, so the player always feels the pressure
-      const maxLag = canvas.height;
+      // Keep rising floor close to the camera so the player can see it
+      // creeping up from below (lava draws at cameraMinY + canvas.height)
+      const maxLag = canvas.height * 0.1;
       if (cameraMinY > camera.y + maxLag) {
         cameraMinY = camera.y + maxLag;
       }
@@ -557,13 +557,22 @@
 
   function drawRisingWarning() {
     if (!risingActive) return;
-    const pulse = 0.5 + 0.3 * Math.sin(frameCount * 0.08);
-    const gradHeight = 50;
-    const grad = ctx.createLinearGradient(0, canvas.height - gradHeight, 0, canvas.height);
-    grad.addColorStop(0, 'rgba(233, 69, 96, 0)');
-    grad.addColorStop(1, `rgba(233, 69, 96, ${pulse})`);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, canvas.height - gradHeight, canvas.width, gradHeight);
+    // Draw lava at the actual rising floor position in world space
+    const floorScreenY = cameraMinY + canvas.height - camera.y;
+    if (floorScreenY < canvas.height + 80) {
+      const lavaTop = Math.max(floorScreenY, 0);
+      // Solid lava fill below the floor line
+      const pulse = 0.85 + 0.15 * Math.sin(frameCount * 0.08);
+      ctx.fillStyle = `rgba(233, 69, 96, ${pulse})`;
+      ctx.fillRect(0, lavaTop, canvas.width, canvas.height - lavaTop);
+      // Gradient glow above the lava line so it's visible approaching
+      const fadeHeight = 80;
+      const grad = ctx.createLinearGradient(0, lavaTop - fadeHeight, 0, lavaTop);
+      grad.addColorStop(0, 'rgba(233, 69, 96, 0)');
+      grad.addColorStop(1, `rgba(233, 69, 96, ${pulse * 0.5})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, lavaTop - fadeHeight, canvas.width, fadeHeight);
+    }
   }
 
   function drawComboText() {
