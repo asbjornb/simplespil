@@ -14,11 +14,6 @@
   <div id="menu" class="menu">
     <h1>Whack-a-Mole!</h1>
     <p class="subtitle">Tap the moles before they hide!</p>
-    <div class="difficulty-select">
-      <button class="diff-btn selected" data-time="30">30s</button>
-      <button class="diff-btn" data-time="45">45s</button>
-      <button class="diff-btn" data-time="60">60s</button>
-    </div>
     <button class="btn btn-primary" id="start-btn">Play!</button>
     <p class="high-score-display" id="menu-high-score"></p>
   </div>
@@ -26,13 +21,15 @@
   <div id="game" class="game-container" style="display:none;">
     <div class="hud">
       <span id="score-display">Score: 0</span>
-      <span id="timer-display">Time: 30</span>
+      <span id="wave-display">Wave 1</span>
       <span id="high-score-display">Best: 0</span>
+      <button id="stop-btn" class="stop-btn">Quit</button>
     </div>
     <canvas id="game-canvas"></canvas>
     <div id="game-over" class="game-over" style="display:none;">
-      <h2>Time's Up!</h2>
+      <h2 id="game-over-title">Game Over!</h2>
       <p id="final-score"></p>
+      <p id="final-wave"></p>
       <p id="new-high" style="display:none;">New High Score!</p>
       <button class="btn btn-primary" id="restart-btn">Play Again</button>
       <button class="btn btn-accent" id="menu-btn">Menu</button>

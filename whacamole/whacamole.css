@@ -9,22 +9,14 @@ html, body {
   font-size: 1.1rem;
 }
 
-.difficulty-select {
-  display: flex;
-  gap: 12px;
-}
-
-.diff-btn {
-  font-size: 1.1rem;
-}
-
-.diff-btn:hover, .diff-btn:active {
-  transform: scale(1.08);
-}
-
-.diff-btn.selected {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 16px rgba(245, 197, 24, 0.3);
+.stop-btn {
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
 }
 
 .game-container {
@@ -36,8 +28,8 @@ html, body {
   position: relative;
 }
 
-#timer-display {
-  color: var(--color-primary);
+#wave-display {
+  color: var(--color-green, #66b344);
 }
 
 #high-score-display {
