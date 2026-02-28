@@ -358,6 +358,12 @@
         cameraMinY = camera.y;
       }
       risingSpeed = Math.min(risingSpeed + RISING_SPEED_INCREASE, RISING_SPEED_MAX);
+      // Keep rising floor tracking the player — don't let it fall more than
+      // one screen behind, so the player always feels the pressure
+      const maxLag = canvas.height;
+      if (cameraMinY > camera.y + maxLag) {
+        cameraMinY = camera.y + maxLag;
+      }
       cameraMinY -= risingSpeed;
     }
 
