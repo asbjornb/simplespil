@@ -278,6 +278,9 @@
     // Platform collision (only when falling)
     if (player.vy >= 0) {
       for (const plat of platforms) {
+        // Skip platforms below the visible screen — prevents invisible landings
+        if (plat.y - camera.y > canvas.height) continue;
+
         const playerBottom = player.y + PLAYER_H;
         const prevBottom = playerBottom - player.vy;
         if (
