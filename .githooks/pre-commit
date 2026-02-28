@@ -1,0 +1,32 @@
+#!/bin/sh
+# Auto-bump the service worker cache version when cached files change.
+# Install once with: git config core.hooksPath .githooks
+
+# Get list of staged files (added, modified, or deleted)
+STAGED=$(git diff --cached --name-only --diff-filter=AMD)
+
+# Check if any staged file is referenced in FILES_TO_CACHE (or sw.js itself)
+NEEDS_BUMP=false
+for f in $STAGED; do
+  case "$f" in
+    sw.js) continue ;;  # don't trigger on sw.js edits alone
+    index.html|shared/*|manifest.json) NEEDS_BUMP=true; break ;;
+    */index.html|*/*.js|*/*.css) NEEDS_BUMP=true; break ;;
+  esac
+done
+
+if [ "$NEEDS_BUMP" = false ]; then
+  exit 0
+fi
+
+# Read current version number and bump it
+CURRENT=$(sed -n "s/^const CACHE_NAME = 'simplespil-v\([0-9]*\)';$/\1/p" sw.js)
+if [ -z "$CURRENT" ]; then
+  exit 0
+fi
+
+NEXT=$((CURRENT + 1))
+sed -i "s/^const CACHE_NAME = 'simplespil-v${CURRENT}';$/const CACHE_NAME = 'simplespil-v${NEXT}';/" sw.js
+git add sw.js
+
+echo "Cache version bumped: v${CURRENT} -> v${NEXT}"
