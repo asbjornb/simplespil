@@ -193,6 +193,241 @@
     }
   ];
 
+  // --- Power-up definitions ---
+  const POWERUPS = [
+    {
+      name: 'wide',
+      color: '#ffd700',
+      label: 'Wide Basket!',
+      duration: 300, // ~5 seconds in frames
+      draw(ctx, x, y, r, shimmer) {
+        // Golden apple
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(x, y + r * 0.1, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + shimmer * 0.2) + ')';
+        ctx.beginPath();
+        ctx.ellipse(x - r * 0.3, y - r * 0.2, r * 0.25, r * 0.4, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        // Stem
+        ctx.strokeStyle = '#5a3a1a';
+        ctx.lineWidth = r * 0.12;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(x, y - r * 0.8);
+        ctx.lineTo(x + r * 0.1, y - r * 1.2);
+        ctx.stroke();
+        // Golden leaf
+        ctx.fillStyle = '#ffe066';
+        ctx.beginPath();
+        ctx.ellipse(x + r * 0.3, y - r * 1.1, r * 0.35, r * 0.15, 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    },
+    {
+      name: 'freeze',
+      color: '#00d4ff',
+      label: 'Freeze!',
+      duration: 300,
+      draw(ctx, x, y, r, shimmer) {
+        // Ice crystal / frozen fruit
+        ctx.fillStyle = '#00d4ff';
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        // Inner glow
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + shimmer * 0.3) + ')';
+        ctx.beginPath();
+        ctx.arc(x, y, r * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        // Snowflake cross
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = r * 0.1;
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 3; i++) {
+          const a = (Math.PI * i) / 3;
+          ctx.beginPath();
+          ctx.moveTo(x + Math.cos(a) * r * 0.7, y + Math.sin(a) * r * 0.7);
+          ctx.lineTo(x - Math.cos(a) * r * 0.7, y - Math.sin(a) * r * 0.7);
+          ctx.stroke();
+        }
+      }
+    },
+    {
+      name: 'double',
+      color: '#ff69b4',
+      label: 'Double Points!',
+      duration: 300,
+      draw(ctx, x, y, r, shimmer) {
+        // Rainbow star
+        const spikes = 5;
+        const outerR = r;
+        const innerR = r * 0.45;
+        ctx.fillStyle = '#ff69b4';
+        ctx.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+          const radius = i % 2 === 0 ? outerR : innerR;
+          const angle = (Math.PI * i) / spikes - Math.PI / 2;
+          const px = x + Math.cos(angle) * radius;
+          const py = y + Math.sin(angle) * radius;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        // Shimmer center
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.4 + shimmer * 0.3) + ')';
+        ctx.beginPath();
+        ctx.arc(x, y, r * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        // x2 text
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + (r * 0.7) + 'px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('x2', x, y + 1);
+      }
+    },
+    {
+      name: 'heart',
+      color: '#ff4466',
+      label: '+1 Life!',
+      duration: 0, // instant effect
+      draw(ctx, x, y, r, shimmer) {
+        // Heart shape
+        ctx.fillStyle = '#ff4466';
+        ctx.beginPath();
+        const topY = y - r * 0.3;
+        ctx.moveTo(x, y + r * 0.8);
+        ctx.bezierCurveTo(x - r * 1.5, y - r * 0.2, x - r * 0.8, topY - r * 0.8, x, topY);
+        ctx.bezierCurveTo(x + r * 0.8, topY - r * 0.8, x + r * 1.5, y - r * 0.2, x, y + r * 0.8);
+        ctx.fill();
+        // Shine
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.25 + shimmer * 0.2) + ')';
+        ctx.beginPath();
+        ctx.ellipse(x - r * 0.3, y - r * 0.3, r * 0.2, r * 0.3, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  ];
+
+  // --- Power-up state ---
+  let activePowerups = {}; // { wide: framesLeft, freeze: framesLeft, double: framesLeft }
+  let totalCatches = 0;
+
+  function getPowerupChance() {
+    // 5% base, only after 10 seconds of play
+    return gameTime > 600 ? 0.05 : 0;
+  }
+
+  function applyPowerup(powerup) {
+    if (powerup.name === 'heart') {
+      if (lives < MAX_LIVES) {
+        lives++;
+        updateHud();
+      }
+    } else {
+      activePowerups[powerup.name] = powerup.duration;
+    }
+  }
+
+  function updatePowerups(dt) {
+    for (const name of Object.keys(activePowerups)) {
+      activePowerups[name] -= dt;
+      if (activePowerups[name] <= 0) {
+        delete activePowerups[name];
+      }
+    }
+  }
+
+  function getBasketWidth() {
+    return activePowerups.wide ? BASKET_W * 1.5 : BASKET_W;
+  }
+
+  function getEffectiveFallSpeed() {
+    const base = getFallSpeed();
+    return activePowerups.freeze ? base * 0.4 : base;
+  }
+
+  function getPointsMultiplier() {
+    return activePowerups.double ? 2 : 1;
+  }
+
+  // --- Streak celebration system ---
+  const celebrations = [];
+  const STREAK_MILESTONES = [
+    { count: 5, text: 'Nice!', color: '#4ecca3' },
+    { count: 10, text: 'Great!', color: '#f5c518' },
+    { count: 20, text: 'Amazing!', color: '#f39c12' },
+    { count: 30, text: 'Incredible!', color: '#ff69b4' },
+    { count: 50, text: 'UNSTOPPABLE!', color: '#ff4444' },
+    { count: 75, text: 'LEGENDARY!', color: '#ffd700' },
+    { count: 100, text: 'GOD MODE!', color: '#00ffff' },
+  ];
+  let lastMilestone = 0;
+
+  function checkStreak() {
+    for (const m of STREAK_MILESTONES) {
+      if (totalCatches === m.count && totalCatches > lastMilestone) {
+        lastMilestone = totalCatches;
+        celebrations.push({
+          text: m.text,
+          color: m.color,
+          life: 1,
+          scale: 0,
+          y: canvas.height * 0.3
+        });
+        // Spawn celebration particles across the screen
+        for (let i = 0; i < 16; i++) {
+          const px = Math.random() * canvas.width;
+          const py = canvas.height * 0.3 + (Math.random() - 0.5) * 60;
+          particles.push({
+            x: px, y: py,
+            vx: (Math.random() - 0.5) * 6,
+            vy: -(2 + Math.random() * 4),
+            life: 1,
+            color: m.color,
+            r: 3 + Math.random() * 5
+          });
+        }
+      }
+    }
+  }
+
+  function updateCelebrations() {
+    for (let i = celebrations.length - 1; i >= 0; i--) {
+      const c = celebrations[i];
+      // Scale up quickly, then hold, then fade
+      if (c.scale < 1) {
+        c.scale = Math.min(1, c.scale + 0.08);
+      }
+      c.y -= 0.3;
+      c.life -= 0.012;
+      if (c.life <= 0) celebrations.splice(i, 1);
+    }
+  }
+
+  function drawCelebrations(ctx) {
+    const font = getComputedStyle(document.body).fontFamily;
+    for (const c of celebrations) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, c.life * 2);
+      ctx.translate(canvas.width / 2, c.y);
+      ctx.scale(c.scale, c.scale);
+      // Shadow for readability
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.font = 'bold 48px ' + font;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(c.text, 2, 2);
+      // Main text
+      ctx.fillStyle = c.color;
+      ctx.fillText(c.text, 0, 0);
+      ctx.restore();
+    }
+  }
+
   // --- Bomb definition ---
   const BOMB = {
     name: 'bomb',
@@ -430,9 +665,13 @@
     lives = MAX_LIVES;
     combo = 0;
     gameTime = 0;
+    totalCatches = 0;
+    lastMilestone = 0;
     fallingItems = [];
     particles.length = 0;
     popups.length = 0;
+    celebrations.length = 0;
+    activePowerups = {};
     spawnTimer = 0;
 
     basket.x = canvas.width / 2;
@@ -490,8 +729,9 @@
       basket.x += speed;
     }
 
-    // Clamp basket position
-    const halfW = BASKET_W / 2;
+    // Clamp basket position (use effective basket width)
+    const currentBasketW = getBasketWidth();
+    const halfW = currentBasketW / 2;
     basket.x = Math.max(halfW, Math.min(canvas.width - halfW, basket.x));
 
     // Spawn items
@@ -501,8 +741,11 @@
       spawnTimer = getSpawnInterval();
     }
 
+    // Update power-up timers
+    updatePowerups(dt);
+
     // Update falling items
-    const fallSpeed = getFallSpeed();
+    const fallSpeed = getEffectiveFallSpeed();
     for (let i = fallingItems.length - 1; i >= 0; i--) {
       const item = fallingItems[i];
       item.y += fallSpeed * dt;
@@ -524,24 +767,37 @@
             endGame();
             return;
           }
+        } else if (item.isPowerup) {
+          // Caught power-up
+          applyPowerup(item.powerup);
+          spawnCatchParticles(item.x, item.y, item.powerup.color);
+          spawnPopup(item.x, item.y - 20, item.powerup.label, item.powerup.color);
+          fallingItems.splice(i, 1);
+          updateHud();
         } else {
           // Caught fruit
           combo++;
+          totalCatches++;
           const comboMult = 1 + Math.floor(combo / 5);
-          const points = item.fruit.points * comboMult;
+          const pointsMult = getPointsMultiplier();
+          const points = item.fruit.points * comboMult * pointsMult;
           score += points;
-          const label = comboMult > 1 ? `+${points} x${comboMult}` : `+${points}`;
+          let label = `+${points}`;
+          if (comboMult > 1 && pointsMult > 1) label += ` x${comboMult} x${pointsMult}`;
+          else if (comboMult > 1) label += ` x${comboMult}`;
+          else if (pointsMult > 1) label += ` x${pointsMult}`;
           spawnCatchParticles(item.x, item.y, item.fruit.color);
           spawnPopup(item.x, item.y - 20, label, item.fruit.color);
           fallingItems.splice(i, 1);
           updateHud();
+          checkStreak();
         }
         continue;
       }
 
       // Missed - fell below screen
       if (item.y > canvas.height + FRUIT_R * 2) {
-        if (!item.isBomb) {
+        if (!item.isBomb && !item.isPowerup) {
           // Missed a fruit
           lives--;
           combo = 0;
@@ -557,6 +813,7 @@
 
     updateParticles();
     updatePopups();
+    updateCelebrations();
   }
 
   function spawnItem() {
@@ -567,19 +824,37 @@
     if (isBomb) {
       fallingItems.push({
         x, y: -FRUIT_R * 2,
-        isBomb: true,
+        isBomb: true, isPowerup: false,
         wobble: Math.random() * Math.PI * 2,
-        fruit: null
+        fruit: null, powerup: null
       });
-    } else {
-      const fruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+      return;
+    }
+
+    // Check for power-up spawn
+    if (Math.random() < getPowerupChance()) {
+      // Pick a random power-up, but only allow heart if lives < MAX
+      let available = POWERUPS;
+      if (lives >= MAX_LIVES) {
+        available = POWERUPS.filter(p => p.name !== 'heart');
+      }
+      const powerup = available[Math.floor(Math.random() * available.length)];
       fallingItems.push({
         x, y: -FRUIT_R * 2,
-        isBomb: false,
+        isBomb: false, isPowerup: true,
         wobble: Math.random() * Math.PI * 2,
-        fruit
+        fruit: null, powerup
       });
+      return;
     }
+
+    const fruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+    fallingItems.push({
+      x, y: -FRUIT_R * 2,
+      isBomb: false, isPowerup: false,
+      wobble: Math.random() * Math.PI * 2,
+      fruit, powerup: null
+    });
   }
 
   // --- Draw ---
@@ -608,24 +883,88 @@
       ctx.translate(wobbleX, 0);
       if (item.isBomb) {
         BOMB.draw(ctx, item.x, item.y, FRUIT_R);
+      } else if (item.isPowerup) {
+        // Glow effect behind power-up
+        const shimmer = Math.sin(item.wobble * 3) * 0.5 + 0.5;
+        ctx.save();
+        ctx.shadowColor = item.powerup.color;
+        ctx.shadowBlur = 12 + shimmer * 8;
+        ctx.beginPath();
+        ctx.arc(item.x, item.y, FRUIT_R * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.01)';
+        ctx.fill();
+        ctx.restore();
+        item.powerup.draw(ctx, item.x, item.y, FRUIT_R, shimmer);
       } else {
         item.fruit.draw(ctx, item.x, item.y, FRUIT_R);
       }
       ctx.restore();
     }
 
-    // Draw basket
-    drawBasket(ctx, basket.x, basket.y, BASKET_W, BASKET_H);
+    // Draw basket (with power-up width)
+    const currentBasketW = getBasketWidth();
+    drawBasket(ctx, basket.x, basket.y, currentBasketW, BASKET_H);
+
+    // Glow effect on basket when wide power-up is active
+    if (activePowerups.wide) {
+      ctx.save();
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 15;
+      ctx.strokeStyle = 'rgba(255,215,0,0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.rect(basket.x - currentBasketW / 2 - 2, basket.y - 4, currentBasketW + 4, BASKET_H + 8);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // Draw particles and popups
     drawParticles(ctx);
     drawPopups(ctx);
 
+    // Draw celebrations
+    drawCelebrations(ctx);
+
+    // Active power-up indicators (top-left area)
+    const font = getComputedStyle(document.body).fontFamily;
+    let indicatorY = 60;
+    for (const name of Object.keys(activePowerups)) {
+      const pu = POWERUPS.find(p => p.name === name);
+      if (!pu) continue;
+      const remaining = activePowerups[name];
+      const fraction = remaining / pu.duration;
+      // Background bar
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath();
+      ctx.roundRect(10, indicatorY, 120, 22, 6);
+      ctx.fill();
+      // Fill bar
+      ctx.fillStyle = pu.color;
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.roundRect(10, indicatorY, 120 * fraction, 22, 6);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      // Label
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px ' + font;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pu.label, 16, indicatorY + 11);
+      indicatorY += 28;
+    }
+
+    // Freeze tint overlay
+    if (activePowerups.freeze) {
+      ctx.fillStyle = 'rgba(0,180,255,0.05)';
+      ctx.fillRect(0, 0, w, h);
+    }
+
     // Combo indicator - only show when multiplier is active
     const comboMult = 1 + Math.floor(combo / 5);
     if (comboMult > 1) {
       ctx.fillStyle = comboMult >= 4 ? '#f5c518' : comboMult >= 2 ? '#f39c12' : '#4ecca3';
-      ctx.font = 'bold 16px ' + getComputedStyle(document.body).fontFamily;
+      ctx.font = 'bold 16px ' + font;
       ctx.textAlign = 'center';
       ctx.fillText(`x${comboMult} bonus!`, basket.x, basket.y - 30);
     }
