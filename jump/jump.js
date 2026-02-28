@@ -681,6 +681,8 @@
     menuEl.style.display = 'none';
     gameEl.style.display = 'flex';
     gameOverEl.style.display = 'none';
+    // Force layout reflow so canvas has dimensions before we read them
+    canvas.getBoundingClientRect();
     resizeCanvas();
 
     groundY = canvas.height - 60;
