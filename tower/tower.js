@@ -18,8 +18,11 @@
 
   // Game constants
   const GRAVITY = 0.45;
-  const JUMP_FORCE = -11;
-  const SUPER_JUMP_FORCE = -15;
+  const BASE_JUMP_FORCE = -10;
+  const MAX_JUMP_FORCE = -15;
+  const COMBO_JUMP_BONUS = -0.7;
+  const MAX_JUMP_COMBO = 7;
+  const COMBO_WINDOW = 30; // grounded frames before combo resets
   const MOVE_SPEED = 4.5;
   const MOVE_ACCEL = 0.6;
   const AIR_FRICTION = 0.97;
@@ -44,7 +47,6 @@
   let camera = { y: 0 };
   let highestFloor = 0;
   let combo = 0;
-  let comboTimer = 0;
   let frameCount = 0;
   let keys = {};
   let particles = [];
@@ -126,7 +128,8 @@
       facing: 1,
       currentFloor: 0,
       jumpCount: 0,
-      walkFrame: 0
+      walkFrame: 0,
+      groundedFrames: 0
     };
   }
 
@@ -147,7 +150,6 @@
     camera.y = 0;
     highestFloor = 0;
     combo = 0;
-    comboTimer = 0;
     frameCount = 0;
     particles = [];
     screenShake = 0;
@@ -283,19 +285,9 @@
           player.y = plat.y - PLAYER_H;
           player.vy = 0;
           player.onGround = true;
+          player.groundedFrames = 0;
 
-          // Track floor progression and combo
-          const floorsJumped = plat.floor - player.currentFloor;
-          if (floorsJumped >= 2) {
-            combo += floorsJumped;
-            comboTimer = 90;
-            spawnComboParticles(player.x, player.y, floorsJumped * 4);
-            screenShake = Math.min(floorsJumped * 2, 8);
-          } else {
-            combo = 0;
-            comboTimer = 0;
-          }
-
+          // Track floor progression
           if (plat.floor > player.currentFloor) {
             player.currentFloor = plat.floor;
             if (plat.floor > highestFloor) {
@@ -307,32 +299,42 @@
       }
     }
 
+    // Track grounded time and reset combo on hesitation
+    if (player.onGround) {
+      player.groundedFrames++;
+      if (player.groundedFrames > COMBO_WINDOW) {
+        combo = 0;
+      }
+    }
+
     // Jump
     if (player.onGround && (keys['ArrowUp'] || keys['w'] || keys[' '] || touchJump)) {
+      // Jump height depends on combo, not horizontal direction
+      const jumpForce = Math.max(BASE_JUMP_FORCE + combo * COMBO_JUMP_BONUS, MAX_JUMP_FORCE);
+      player.vy = jumpForce;
+
       if (touchJump) {
         // Touch/click: horizontal velocity from tap position
         player.vx = touchLaunchVx;
         if (touchLaunchVx !== 0) player.facing = Math.sign(touchLaunchVx);
-        // Super jump when tapping far from center
-        if (Math.abs(touchLaunchVx) > MAX_LAUNCH_VX * 0.5) {
-          player.vy = SUPER_JUMP_FORCE;
-        } else {
-          player.vy = JUMP_FORCE;
-        }
         touchJump = false;
       } else {
         // Keyboard: launch in facing direction
         player.vx = player.facing * MOVE_SPEED;
-        player.vy = JUMP_FORCE;
       }
+
+      // Build combo on quick successive jumps
+      combo = Math.min(combo + 1, MAX_JUMP_COMBO);
+      if (combo > 2) {
+        spawnComboParticles(player.x, player.y, combo * 2);
+        screenShake = Math.min(combo, 6);
+      }
+
       player.onGround = false;
+      player.groundedFrames = 0;
       player.jumpCount++;
       spawnJumpParticles(player.x, player.y + PLAYER_H);
     }
-
-    // Combo timer
-    if (comboTimer > 0) comboTimer--;
-    if (comboTimer <= 0 && player.onGround) combo = 0;
 
     // Screen shake decay
     if (screenShake > 0) screenShake *= 0.85;
