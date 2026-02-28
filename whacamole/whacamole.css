@@ -36,8 +36,8 @@ html, body {
   position: relative;
 }
 
-#timer-display {
-  color: var(--color-primary);
+#wave-display {
+  color: var(--color-green, #66b344);
 }
 
 #high-score-display {
