@@ -86,7 +86,14 @@ All game files must be added to the `FILES_TO_CACHE` array in `sw.js` so they wo
   '/<game>/<game>.js',
   '/<game>/icon.js',
 ```
-Also add any new shared scripts (e.g. `/shared/high-scores.js`) if not already listed. After updating the list, bump the `CACHE_NAME` version number so existing installations re-cache.
+Also add any new shared scripts (e.g. `/shared/high-scores.js`) if not already listed.
+
+**Important:** After updating `FILES_TO_CACHE` or changing any cached file, bump the `CACHE_NAME` version number (e.g. `simplespil-v5` → `simplespil-v6`) so existing installations re-cache. Without this, offline users won't get the updated files.
+
+A pre-commit hook in `.githooks/` automates this — it bumps the version whenever cached files are staged. To enable it (one-time setup):
+```sh
+git config core.hooksPath .githooks
+```
 
 ## Code Style
 
