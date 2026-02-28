@@ -574,11 +574,7 @@
   let lastSpawnEdge = 0;
 
   const GRAVITY = 0.6;
-  const BASE_JUMP_FORCE = -9;
-  const MAX_JUMP_FORCE = -12.5;
-  const COMBO_BONUS = -0.5;
-  const MAX_COMBO = 7;
-  const COMBO_WINDOW = 25; // frames grounded before combo resets
+  const JUMP_FORCE = -12;
   const PLAYER_W = 60;
   const PLAYER_H = 55;
   const MIN_OBSTACLE_GAP = 400;
@@ -721,9 +717,7 @@
       h: PLAYER_H,
       vy: 0,
       jumping: false,
-      grounded: true,
-      combo: 0,
-      groundedFrames: 0
+      grounded: true
     };
 
     updateHighScoreDisplay();
@@ -751,12 +745,9 @@
   function jump() {
     if (!gameRunning) return;
     if (player.grounded) {
-      const force = Math.max(BASE_JUMP_FORCE + player.combo * COMBO_BONUS, MAX_JUMP_FORCE);
-      player.vy = force;
+      player.vy = JUMP_FORCE;
       player.jumping = true;
       player.grounded = false;
-      player.combo = Math.min(player.combo + 1, MAX_COMBO);
-      player.groundedFrames = 0;
     }
   }
 
@@ -846,14 +837,6 @@
     // No longer on any surface - start falling
     if (!landed && player.vy > 0) {
       player.grounded = false;
-    }
-
-    // Track grounded time and reset combo on hesitation
-    if (player.grounded) {
-      player.groundedFrames++;
-      if (player.groundedFrames > COMBO_WINDOW) {
-        player.combo = 0;
-      }
     }
 
     // Fell off screen (into pit)
@@ -1104,16 +1087,6 @@
 
     // Player
     characters[selectedChar].draw(ctx, player.x, player.y, player.w, player.h, animFrame);
-
-    // Combo indicator
-    if (player.combo > 0) {
-      const comboText = `x${player.combo}`;
-      ctx.font = 'bold 18px sans-serif';
-      ctx.fillStyle = player.combo >= MAX_COMBO ? '#f5c518' : '#fff';
-      ctx.globalAlpha = player.grounded && player.groundedFrames > COMBO_WINDOW * 0.6 ? 0.4 : 0.9;
-      ctx.fillText(comboText, player.x + player.w * 0.5 - 8, player.y - 8);
-      ctx.globalAlpha = 1;
-    }
   }
 
   function endGame() {
