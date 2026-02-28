@@ -577,7 +577,7 @@
   const JUMP_FORCE = -13;
   const PLAYER_W = 60;
   const PLAYER_H = 55;
-  const MIN_OBSTACLE_GAP = 450;
+  const MIN_OBSTACLE_GAP = 400;
 
   // --- DOM refs ---
   const menuEl = document.getElementById('menu');
@@ -848,7 +848,7 @@
     // Procedural terrain/obstacle generation
     lastSpawnEdge -= gameSpeed;
     const spawnChance = 0.02 + score * 0.0001;
-    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.15, 350);
+    const minGap = Math.max(MIN_OBSTACLE_GAP - score * 0.2, 300);
 
     if (lastSpawnEdge < canvas.width - minGap) {
       if (Math.random() < spawnChance) {
