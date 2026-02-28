@@ -37,8 +37,9 @@
   const FALL_DEATH_MARGIN = 250;
   const MAX_LAUNCH_VX = 7;
   const RISING_FLOOR_START = 20;
-  const RISING_SPEED_BASE = 0.15;
-  const RISING_SPEED_INCREASE = 0.001;
+  const RISING_SPEED_BASE = 0.3;
+  const RISING_SPEED_INCREASE = 0.0004;
+  const RISING_SPEED_MAX = 1.2;
 
   // Game state
   let gameRunning = false;
@@ -129,7 +130,8 @@
       currentFloor: 0,
       jumpCount: 0,
       walkFrame: 0,
-      groundedFrames: 0
+      groundedFrames: 0,
+      jumpFromFloor: 0
     };
   }
 
@@ -287,6 +289,11 @@
           player.onGround = true;
           player.groundedFrames = 0;
 
+          // Reset combo if this jump only gained 0-1 floors
+          if (plat.floor - player.jumpFromFloor <= 1) {
+            combo = 0;
+          }
+
           // Track floor progression
           if (plat.floor > player.currentFloor) {
             player.currentFloor = plat.floor;
@@ -332,6 +339,7 @@
 
       player.onGround = false;
       player.groundedFrames = 0;
+      player.jumpFromFloor = player.currentFloor;
       player.jumpCount++;
       spawnJumpParticles(player.x, player.y + PLAYER_H);
     }
@@ -346,7 +354,7 @@
         risingSpeed = RISING_SPEED_BASE;
         cameraMinY = camera.y;
       }
-      risingSpeed += RISING_SPEED_INCREASE;
+      risingSpeed = Math.min(risingSpeed + RISING_SPEED_INCREASE, RISING_SPEED_MAX);
       cameraMinY -= risingSpeed;
     }
 
