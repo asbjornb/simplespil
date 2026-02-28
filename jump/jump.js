@@ -574,7 +574,6 @@
   let lastSpawnEdge = 0;
   let risingFloor;
   const keysDown = {};
-  let touchDir = 0; // track active touch direction for continuous acceleration
   const RISING_WARN_SCORE = 80;
   const RISING_START_SCORE = 120;
 
@@ -755,7 +754,7 @@
       // Only override horizontal velocity if a direction was given;
       // otherwise preserve existing momentum from arrow keys
       if (direction) {
-        player.vx = direction * 14;
+        player.vx = direction * 30;
       }
       player.jumping = true;
       player.grounded = false;
@@ -789,13 +788,7 @@
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const dir = tapDirection(e.touches[0].clientX, rect);
-      touchDir = dir;
-      jump(dir);
-    });
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      touchDir = 0;
+      jump(tapDirection(e.touches[0].clientX, rect));
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -840,9 +833,8 @@
     // Horizontal movement (keyboard + touch)
     if (keysDown['ArrowLeft']) player.vx -= 0.8;
     if (keysDown['ArrowRight']) player.vx += 0.8;
-    if (touchDir) player.vx += touchDir * 0.8;
-    if (player.vx > 14) player.vx = 14;
-    if (player.vx < -14) player.vx = -14;
+    if (player.vx > 30) player.vx = 30;
+    if (player.vx < -30) player.vx = -30;
 
     // Apply horizontal velocity
     player.x += player.vx;
@@ -899,9 +891,6 @@
     if (!landed && player.vy > 0) {
       player.grounded = false;
     }
-
-    // Clear touch direction once landed so player doesn't slide
-    if (player.grounded) touchDir = 0;
 
     // Horizontal friction
     if (player.grounded) {
