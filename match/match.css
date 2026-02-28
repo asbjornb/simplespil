@@ -38,44 +38,10 @@
   background: var(--color-secondary);
 }
 
-.level-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  width: 100%;
-  max-width: 400px;
-  padding: 4px 0 40px;
-}
-
-.level-card {
-  background: var(--color-surface);
-  border: 3px solid var(--card-color, var(--color-primary));
-  border-radius: var(--radius);
-  padding: 14px 8px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font-main);
-  color: var(--color-text);
-}
-
-.level-card:hover,
-.level-card:active {
-  transform: scale(1.05);
-  background: var(--color-secondary);
-}
-
-.level-icon-canvas {
-  width: 60px;
-  height: 60px;
-}
-
-.level-name {
-  font-size: 1rem;
-  font-weight: bold;
+.play-btn {
+  margin-top: 12px;
+  font-size: 1.4rem;
+  padding: 16px 48px;
 }
 
 #game {
@@ -128,10 +94,6 @@
 @media (max-width: 600px) {
   .game-over h1 {
     font-size: 2.2rem;
-  }
-
-  .level-grid {
-    max-width: 320px;
   }
 
   .diff-btn {

@@ -8,7 +8,8 @@
   const winScreen = document.getElementById('win-screen');
   const againBtn = document.getElementById('again-btn');
   const nextBtn = document.getElementById('next-btn');
-  const levelsBtn = document.getElementById('levels-btn');
+  const menuBtn = document.getElementById('menu-btn');
+  const playBtn = document.getElementById('play-btn');
 
   // ─── Constants ───────────────────────────────────────────
 
@@ -1143,6 +1144,14 @@
 
   // ─── Game flow ──────────────────────────────────────────
 
+  function pickRandomLevel() {
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * LEVEL_IDS.length);
+    } while (idx === currentLevelIdx && LEVEL_IDS.length > 1);
+    currentLevelIdx = idx;
+  }
+
   function startGame() {
     menu.style.display = 'none';
     game.style.display = 'flex';
@@ -1180,10 +1189,14 @@
 
   againBtn.addEventListener('click', startGame);
   nextBtn.addEventListener('click', () => {
-    currentLevelIdx = (currentLevelIdx + 1) % LEVEL_IDS.length;
+    pickRandomLevel();
     startGame();
   });
-  levelsBtn.addEventListener('click', goToMenu);
+  menuBtn.addEventListener('click', goToMenu);
+  playBtn.addEventListener('click', () => {
+    pickRandomLevel();
+    startGame();
+  });
 
   canvas.addEventListener('mousedown', onPointerDown);
   canvas.addEventListener('mousemove', onPointerMove);
@@ -1297,131 +1310,4 @@
     });
   });
 
-  document.querySelectorAll('.level-card').forEach(card => {
-    card.addEventListener('click', () => {
-      currentLevelIdx = parseInt(card.dataset.level, 10);
-      startGame();
-    });
-  });
-
-  // ─── Level card icons ───────────────────────────────────
-
-  function drawLevelIcons() {
-    const canvases = document.querySelectorAll('.level-icon-canvas');
-    const dpr = window.devicePixelRatio || 1;
-
-    canvases.forEach((c, idx) => {
-      c.width = 60 * dpr;
-      c.height = 60 * dpr;
-      const lctx = c.getContext('2d');
-      lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      switch (idx) {
-        case 0: // Colors
-          lctx.beginPath(); lctx.arc(15, 20, 10, 0, Math.PI * 2);
-          lctx.fillStyle = '#e94560'; lctx.fill();
-          lctx.beginPath(); lctx.arc(30, 38, 10, 0, Math.PI * 2);
-          lctx.fillStyle = '#3498db'; lctx.fill();
-          lctx.beginPath(); lctx.arc(45, 20, 10, 0, Math.PI * 2);
-          lctx.fillStyle = '#4ecca3'; lctx.fill();
-          break;
-
-        case 1: // Shapes
-          // Triangle
-          lctx.beginPath();
-          lctx.moveTo(15, 30); lctx.lineTo(25, 12); lctx.lineTo(5, 30);
-          lctx.closePath(); lctx.fillStyle = '#3498db'; lctx.fill();
-          // Star
-          drawMiniStar(lctx, 42, 22, 12, '#f5c518');
-          // Square
-          lctx.fillStyle = '#e94560';
-          lctx.fillRect(20, 36, 16, 16);
-          break;
-
-        case 2: // Animals
-          // Mini cat face
-          lctx.beginPath(); lctx.arc(30, 34, 14, 0, Math.PI * 2);
-          lctx.fillStyle = '#4ecca3'; lctx.fill();
-          lctx.beginPath();
-          lctx.moveTo(19, 26); lctx.lineTo(23, 14); lctx.lineTo(27, 26); lctx.closePath();
-          lctx.fill();
-          lctx.beginPath();
-          lctx.moveTo(41, 26); lctx.lineTo(37, 14); lctx.lineTo(33, 26); lctx.closePath();
-          lctx.fill();
-          lctx.fillStyle = '#fff';
-          lctx.beginPath(); lctx.arc(25, 32, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(35, 32, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.fillStyle = '#ffb6c1';
-          lctx.beginPath();
-          lctx.moveTo(30, 37); lctx.lineTo(28, 40); lctx.lineTo(32, 40); lctx.closePath();
-          lctx.fill();
-          break;
-
-        case 3: // Numbers
-          lctx.textAlign = 'center';
-          lctx.textBaseline = 'middle';
-          lctx.font = 'bold 18px sans-serif';
-          lctx.fillStyle = '#e94560'; lctx.fillText('1', 12, 24);
-          lctx.fillStyle = '#3498db'; lctx.fillText('2', 30, 24);
-          lctx.fillStyle = '#4ecca3'; lctx.fillText('3', 48, 24);
-          // Dots below
-          lctx.fillStyle = '#f5c518';
-          lctx.beginPath(); lctx.arc(12, 44, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(26, 44, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(34, 44, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(44, 40, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(48, 46, 3, 0, Math.PI * 2); lctx.fill();
-          lctx.beginPath(); lctx.arc(52, 40, 3, 0, Math.PI * 2); lctx.fill();
-          break;
-
-        case 4: // Fruits
-          // Apple
-          lctx.beginPath(); lctx.arc(20, 32, 12, 0, Math.PI * 2);
-          lctx.fillStyle = '#e94560'; lctx.fill();
-          lctx.strokeStyle = '#8B4513'; lctx.lineWidth = 1.5;
-          lctx.beginPath(); lctx.moveTo(20, 21); lctx.lineTo(21, 16); lctx.stroke();
-          lctx.fillStyle = '#4ecca3';
-          lctx.beginPath(); lctx.ellipse(24, 17, 4, 2, 0.5, 0, Math.PI * 2); lctx.fill();
-          // Banana
-          lctx.fillStyle = '#f5c518';
-          lctx.beginPath();
-          lctx.moveTo(38, 42);
-          lctx.quadraticCurveTo(35, 22, 44, 18);
-          lctx.quadraticCurveTo(50, 20, 50, 30);
-          lctx.quadraticCurveTo(48, 28, 44, 26);
-          lctx.quadraticCurveTo(40, 28, 38, 42);
-          lctx.closePath(); lctx.fill();
-          break;
-
-        case 5: // Mix
-          drawMiniStar(lctx, 20, 24, 12, '#e94560');
-          lctx.beginPath();
-          lctx.moveTo(45, 42);
-          lctx.bezierCurveTo(33, 30, 39, 18, 45, 24);
-          lctx.bezierCurveTo(51, 18, 57, 30, 45, 42);
-          lctx.closePath();
-          lctx.fillStyle = '#3498db'; lctx.fill();
-          lctx.fillStyle = '#f5c518';
-          lctx.fillRect(10, 40, 14, 14);
-          break;
-      }
-    });
-  }
-
-  function drawMiniStar(lctx, cx, cy, r, color) {
-    lctx.beginPath();
-    for (let i = 0; i < 10; i++) {
-      const rad = (i * Math.PI) / 5 - Math.PI / 2;
-      const rr = i % 2 === 0 ? r : r * 0.4;
-      const x = cx + Math.cos(rad) * rr;
-      const y = cy + Math.sin(rad) * rr;
-      if (i === 0) lctx.moveTo(x, y);
-      else lctx.lineTo(x, y);
-    }
-    lctx.closePath();
-    lctx.fillStyle = color;
-    lctx.fill();
-  }
-
-  drawLevelIcons();
 })();
