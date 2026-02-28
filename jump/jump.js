@@ -572,10 +572,6 @@
   let pits = [];
   let platforms = [];
   let lastSpawnEdge = 0;
-  let risingFloor;
-  const keysDown = {};
-  const RISING_WARN_SCORE = 80;
-  const RISING_START_SCORE = 120;
 
   const GRAVITY = 0.6;
   const JUMP_FORCE = -12;
@@ -696,8 +692,6 @@
     pits = [];
     platforms = [];
     lastSpawnEdge = 0;
-    risingFloor = canvas.height;
-
     // Init ground tiles
     groundTiles = [];
     for (let i = 0; i < canvas.width + 40; i += 20) {
@@ -720,7 +714,6 @@
       w: PLAYER_W,
       h: PLAYER_H,
       vy: 0,
-      vx: 0,
       jumping: false,
       grounded: true
     };
@@ -747,15 +740,10 @@
   });
 
   // --- Input ---
-  function jump(direction) {
+  function jump() {
     if (!gameRunning) return;
     if (player.grounded) {
       player.vy = JUMP_FORCE;
-      // Only override horizontal velocity if a direction was given;
-      // otherwise preserve existing momentum from arrow keys
-      if (direction) {
-        player.vx = direction * 30;
-      }
       player.jumping = true;
       player.grounded = false;
     }
@@ -764,36 +752,19 @@
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp') {
       e.preventDefault();
-      jump(0);
-    }
-    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
-      e.preventDefault();
-      keysDown[e.code] = true;
-    }
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
-      keysDown[e.code] = false;
+      jump();
     }
   });
 
   canvas = document.getElementById('game-canvas');
   if (canvas) {
-    function tapDirection(clientX, rect) {
-      const rawDir = (clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
-      if (Math.abs(rawDir) < 0.08) return 0; // narrow center dead zone = jump straight up
-      return Math.sign(rawDir); // full speed left or right
-    }
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      jump(tapDirection(e.touches[0].clientX, rect));
+      jump();
     });
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      jump(tapDirection(e.clientX, rect));
+      jump();
     });
   }
 
@@ -829,32 +800,6 @@
     // Player physics
     player.vy += GRAVITY;
     player.y += player.vy;
-
-    // Horizontal movement (keyboard + touch)
-    if (keysDown['ArrowLeft']) player.vx -= 0.8;
-    if (keysDown['ArrowRight']) player.vx += 0.8;
-    if (player.vx > 30) player.vx = 30;
-    if (player.vx < -30) player.vx = -30;
-
-    // Apply horizontal velocity
-    player.x += player.vx;
-
-    // Keep player in bounds
-    if (player.x < 0) { player.x = 0; player.vx = 0; }
-    if (player.x + player.w > canvas.width) { player.x = canvas.width - player.w; player.vx = 0; }
-
-    // Camera: keep player toward the left so upcoming terrain is visible
-    const cameraTargetX = canvas.width * 0.25;
-    if (player.x > cameraTargetX) {
-      const extraScroll = player.x - cameraTargetX;
-      player.x = cameraTargetX;
-      for (const obs of obstacles) obs.x -= extraScroll;
-      for (const pit of pits) pit.x -= extraScroll;
-      for (const plat of platforms) plat.x -= extraScroll;
-      for (const cloud of clouds) cloud.x -= extraScroll;
-      for (const tile of groundTiles) tile.x -= extraScroll;
-      lastSpawnEdge -= extraScroll;
-    }
 
     // Check platform landing (only when falling)
     let landed = false;
@@ -892,28 +837,10 @@
       player.grounded = false;
     }
 
-    // Horizontal friction
-    if (player.grounded) {
-      player.vx *= 0.92;
-    } else {
-      player.vx *= 0.98;
-    }
-    if (Math.abs(player.vx) < 0.05) player.vx = 0;
-
-    // Fell off screen (into pit) - die shortly after dropping below ground
-    if (player.y > groundY + 20) {
+    // Fell off screen (into pit)
+    if (player.y > canvas.height + 50) {
       endGame();
       return;
-    }
-
-    // Rising floor
-    if (score >= RISING_START_SCORE) {
-      const riseSpeed = 0.3 + (score - RISING_START_SCORE) * 0.002;
-      risingFloor -= riseSpeed;
-      if (player.y + player.h > risingFloor) {
-        endGame();
-        return;
-      }
     }
 
     // Procedural terrain/obstacle generation
@@ -1154,33 +1081,6 @@
       } else if (obs.type === 'log') {
         drawLog(ctx, obs.x, obs.y, obs.w, obs.h);
       }
-    }
-
-    // Rising floor warning glow
-    if (score >= RISING_WARN_SCORE) {
-      const glowIntensity = Math.min((score - RISING_WARN_SCORE) / (RISING_START_SCORE - RISING_WARN_SCORE), 1);
-      const pulseAlpha = 0.15 + Math.sin(frameCount * 0.08) * 0.1;
-      const glowHeight = 30 + glowIntensity * 40;
-      const glowGrad = ctx.createLinearGradient(0, canvas.height - glowHeight, 0, canvas.height);
-      glowGrad.addColorStop(0, 'rgba(255, 0, 0, 0)');
-      glowGrad.addColorStop(1, `rgba(255, 50, 50, ${pulseAlpha * glowIntensity})`);
-      ctx.fillStyle = glowGrad;
-      ctx.fillRect(0, canvas.height - glowHeight, canvas.width, glowHeight);
-    }
-
-    // Rising lava floor
-    if (risingFloor < canvas.height) {
-      const lavaGrad = ctx.createLinearGradient(0, risingFloor - 10, 0, risingFloor + 30);
-      lavaGrad.addColorStop(0, 'rgba(255, 100, 50, 0.6)');
-      lavaGrad.addColorStop(0.3, '#e94560');
-      lavaGrad.addColorStop(1, '#8b0000');
-      ctx.fillStyle = lavaGrad;
-      ctx.fillRect(0, risingFloor, canvas.width, canvas.height - risingFloor);
-      const aboveGrad = ctx.createLinearGradient(0, risingFloor - 25, 0, risingFloor);
-      aboveGrad.addColorStop(0, 'rgba(255, 50, 50, 0)');
-      aboveGrad.addColorStop(1, 'rgba(255, 80, 50, 0.4)');
-      ctx.fillStyle = aboveGrad;
-      ctx.fillRect(0, risingFloor - 25, canvas.width, 25);
     }
 
     // Player
