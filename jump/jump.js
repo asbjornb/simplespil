@@ -574,7 +574,7 @@
   let lastSpawnEdge = 0;
 
   const GRAVITY = 0.5;
-  const JUMP_FORCE = -13;
+  const JUMP_FORCE = -12.5;
   const PLAYER_W = 60;
   const PLAYER_H = 55;
   const MIN_OBSTACLE_GAP = 400;
@@ -861,7 +861,8 @@
         } else if (roll < 0.45) {
           // Cluster of 2 ground obstacles with guaranteed landing gap
           spawnGroundObstacle(canvas.width + 20);
-          const clearGap = PLAYER_W + 120 + Math.random() * 60;
+          const speedScale = gameSpeed / 4;
+          const clearGap = (PLAYER_W + 120 + Math.random() * 60) * speedScale;
           spawnGroundObstacle(lastSpawnEdge + clearGap);
         } else if (roll < 0.6 && difficulty > 0.15) {
           // Flying bird
